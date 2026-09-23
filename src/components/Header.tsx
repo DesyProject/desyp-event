@@ -61,7 +61,7 @@ export default function Header() {
         </nav>
 
         <a href="#entry-card" className="header__cta">
-          PLAY TOGETHER →
+          JOIN EVENT →
         </a>
 
         <button

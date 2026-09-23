@@ -24,6 +24,12 @@ function consumeLoginError(): string | null {
   return LOGIN_ERROR_MESSAGES[reason] ?? LOGIN_ERROR_MESSAGES.default
 }
 
+/** "자세히"를 누르면 개인정보 안내를 펼친 뒤 그 위치로 이동한다 */
+function openPrivacy() {
+  const el = document.getElementById('privacy') as HTMLDetailsElement | null
+  if (el) el.open = true
+}
+
 export default function EntryCard() {
   const countdown = useCountdown(import.meta.env.VITE_REGISTRATION_END_AT)
   const ageId = useId()
@@ -177,7 +183,7 @@ export default function EntryCard() {
                 onChange={(e) => setAgreePrivacy(e.target.checked)}
               />
               <label htmlFor={privacyId}>
-                [필수] 개인정보 수집·이용에 동의합니다. <a href="#about">자세히</a>
+                [필수] 개인정보 수집·이용에 동의합니다. <a href="#privacy" onClick={openPrivacy}>자세히</a>
               </label>
             </div>
             <div className="entry-form__checkbox-row">
