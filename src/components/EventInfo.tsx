@@ -1,13 +1,13 @@
 const INFO_ITEMS = [
-  { icon: '👥', title: '참여 대상', body: '만 14세 이상' },
-  { icon: '🗄️', title: '수집 정보', body: 'Instagram ID' },
+  { icon: '👥', title: '참여 대상', body: '만 14세 이상 (네이버 로그인)' },
+  { icon: '🗄️', title: '수집 정보', body: '휴대전화번호 (네이버 계정에서 제공)' },
   {
     icon: '📄',
     title: '이용 목적',
     body: (
       <>
-        · 경품행사 응모 확인
-        <br />· 당첨자 선정 및 연락
+        · 사전등록 확인 및 중복 등록 방지
+        <br />· 오픈 소식 및 이벤트 관련 안내
       </>
     ),
   },
@@ -56,7 +56,7 @@ export default function EventInfo() {
           </span>
           <div>
             <h3 className="info-card__title">보유 기간</h3>
-            <p className="info-card__body">행사 종료 후 {retentionDays}일 이내 파기</p>
+            <p className="info-card__body">이벤트 종료 후 {retentionDays}일 이내 파기</p>
           </div>
         </div>
         <p className="about__handwritten">SMALL PARTICIPATION BIG CHANGES</p>

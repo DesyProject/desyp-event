@@ -11,9 +11,9 @@ export default defineConfig(({ mode }) => {
       '[config] VITE_RETENTION_DAYS 환경 변수가 필요합니다 (예: .env 파일에 VITE_RETENTION_DAYS=30 추가).',
     )
   }
-  if (!env.VITE_EVENT_END_AT || !env.VITE_EVENT_END_AT.trim()) {
+  if (!env.VITE_REGISTRATION_END_AT || !env.VITE_REGISTRATION_END_AT.trim()) {
     throw new Error(
-      '[config] VITE_EVENT_END_AT 환경 변수가 필요합니다 (ISO 8601, KST 오프셋 포함. 예: 2026-10-01T23:59:59+09:00).',
+      '[config] VITE_REGISTRATION_END_AT 환경 변수가 필요합니다 (ISO 8601, KST 오프셋 포함. 예: 2026-10-01T23:59:59+09:00).',
     )
   }
 

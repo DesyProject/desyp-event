@@ -1,33 +1,67 @@
-import { useId, useMemo, useState } from 'react'
-import { submitEntry } from '../api/entry'
+import { useEffect, useId, useState } from 'react'
+import {
+  fetchMe,
+  LOGIN_ERROR_MESSAGES,
+  startNaverLogin,
+  submitPreRegistration,
+  type Me,
+} from '../api/preRegistration'
 import { pad2, useCountdown } from '../hooks/useCountdown'
-import { isValidInstagramId, normalizeInstagramId } from '../utils/instagram'
 import ResultModal from './ResultModal'
 
+/** 백엔드가 로그인 뒤 돌려보낸 ?login=error&reason=... 를 읽고 주소에서 지운다 */
+function consumeLoginError(): string | null {
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('login') !== 'error') return null
+  const reason = params.get('reason') ?? 'default'
+  params.delete('login')
+  params.delete('reason')
+  const query = params.toString()
+  window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`)
+  return LOGIN_ERROR_MESSAGES[reason] ?? LOGIN_ERROR_MESSAGES.default
+}
+
 export default function EntryCard() {
-  const countdown = useCountdown(import.meta.env.VITE_EVENT_END_AT)
-  const inputId = useId()
-  const checkboxId = useId()
+  const countdown = useCountdown(import.meta.env.VITE_REGISTRATION_END_AT)
+  const ageId = useId()
+  const privacyId = useId()
+  const marketingId = useId()
 
-  const [rawId, setRawId] = useState('')
+  // undefined: 로그인 여부 확인 중, null: 로그인 전
+  const [me, setMe] = useState<Me | null | undefined>(undefined)
   const [ageConfirmed, setAgeConfirmed] = useState(false)
-  const [touched, setTouched] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
-  const [modalMessage, setModalMessage] = useState<string | null>(null)
+  const [agreePrivacy, setAgreePrivacy] = useState(false)
+  const [agreeMarketing, setAgreeMarketing] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [modalMessage, setModalMessage] = useState<string | null>(() => consumeLoginError())
 
-  const normalizedId = useMemo(() => normalizeInstagramId(rawId), [rawId])
-  const idValid = normalizedId.length > 0 && isValidInstagramId(normalizedId)
-  const showIdHint = touched && rawId.length > 0 && !idValid
-  const canSubmit = idValid && ageConfirmed && !submitting && !countdown.isEnded
+  useEffect(() => {
+    fetchMe()
+      .then(setMe)
+      .catch(() => setMe(null))
+  }, [])
+
+  const closed = countdown.isEnded
+  const canSubmit = !!me && !me.registered && ageConfirmed && agreePrivacy && !busy && !closed
+
+  async function handleLogin() {
+    setBusy(true)
+    await startNaverLogin() // 실제 모드는 여기서 네이버로 페이지가 이동한다
+    setMe(await fetchMe())
+    setBusy(false)
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setTouched(true)
     if (!canSubmit) return
-
-    setSubmitting(true)
-    const result = await submitEntry({ instagramId: normalizedId, ageConfirmed })
-    setSubmitting(false)
+    setBusy(true)
+    const result = await submitPreRegistration({ ageConfirmed, agreePrivacy, agreeMarketing })
+    setBusy(false)
+    if (result.kind === 'success' || result.kind === 'already') {
+      setMe((prev) => prev && { ...prev, registered: true })
+    } else if (result.kind === 'unauthorized') {
+      setMe(null)
+    }
     setModalMessage(result.message)
   }
 
@@ -38,7 +72,7 @@ export default function EntryCard() {
       <div className="entry-card__corner entry-card__corner--bl" aria-hidden="true" />
       <div className="entry-card__corner entry-card__corner--br" aria-hidden="true" />
 
-      <p className="entry-card__label">EVENT ENDS IN</p>
+      <p className="entry-card__label">PRE-REGISTRATION ENDS IN</p>
 
       <div className="countdown">
         {/* 마지막 날(0일)에는 일 칸을 숨긴다 */}
@@ -67,53 +101,75 @@ export default function EntryCard() {
         </div>
       </div>
 
-      {countdown.isEnded && <p className="entry-card__ended">이벤트가 종료되었습니다</p>}
+      <div className="entry-form">
+        {!closed && !me?.registered && <h2 className="entry-form__title">이벤트 사전등록</h2>}
+        {closed ? (
+          <p className="entry-card__status">사전등록이 마감되었습니다</p>
+        ) : me?.registered ? (
+          <div className="entry-card__status">
+            <p className="entry-card__status-title">사전등록 완료!</p>
+            <p className="entry-card__status-body">오픈 소식을 가장 먼저 알려드릴게요.</p>
+          </div>
+        ) : me ? (
+          <form onSubmit={handleSubmit} noValidate>
+            <p className="entry-form__account">
+              <span className="entry-form__account-label">네이버 계정 연결됨</span>
+              {me.phoneMasked}
+            </p>
 
-      <form className="entry-form" onSubmit={handleSubmit} noValidate>
-        <label htmlFor={inputId} className="entry-form__label">
-          Instagram ID
-        </label>
-        <div className="entry-form__input-wrap">
-          <span className="entry-form__at" aria-hidden="true">
-            @
-          </span>
-          <input
-            id={inputId}
-            type="text"
-            className="entry-form__input"
-            placeholder="예) desyp_official"
-            value={rawId}
-            disabled={countdown.isEnded}
-            onChange={(e) => setRawId(e.target.value)}
-            onBlur={() => setTouched(true)}
-            autoComplete="off"
-            aria-invalid={showIdHint}
-            aria-describedby={showIdHint ? `${inputId}-hint` : undefined}
-          />
-        </div>
-        {showIdHint && (
-          <p id={`${inputId}-hint`} className="entry-form__hint">
-            영문 소문자, 숫자, '.', '_'만 사용해 1~30자로 입력해주세요.
-          </p>
+            <div className="entry-form__checkbox-row">
+              <input
+                id={ageId}
+                type="checkbox"
+                checked={ageConfirmed}
+                onChange={(e) => setAgeConfirmed(e.target.checked)}
+              />
+              <label htmlFor={ageId}>[필수] 본인은 만 14세 이상입니다.</label>
+            </div>
+            <div className="entry-form__checkbox-row">
+              <input
+                id={privacyId}
+                type="checkbox"
+                checked={agreePrivacy}
+                onChange={(e) => setAgreePrivacy(e.target.checked)}
+              />
+              <label htmlFor={privacyId}>
+                [필수] 개인정보 수집·이용에 동의합니다. <a href="#about">자세히</a>
+              </label>
+            </div>
+            <div className="entry-form__checkbox-row">
+              <input
+                id={marketingId}
+                type="checkbox"
+                checked={agreeMarketing}
+                onChange={(e) => setAgreeMarketing(e.target.checked)}
+              />
+              <label htmlFor={marketingId}>[선택] 오픈 소식 알림 수신에 동의합니다.</label>
+            </div>
+
+            <button type="submit" className="entry-form__submit" disabled={!canSubmit}>
+              {busy ? '등록 중…' : '사전등록하기 →'}
+            </button>
+          </form>
+        ) : (
+          <>
+            <button
+              type="button"
+              className="naver-login"
+              onClick={handleLogin}
+              disabled={me === undefined || busy}
+            >
+              <svg className="naver-login__logo" viewBox="0 0 20 20" aria-hidden="true">
+                <path fill="currentColor" d="M13.56 10.7 6.17 0H0v20h6.44V9.3L13.83 20H20V0h-6.44z" />
+              </svg>
+              네이버로 로그인
+            </button>
+            <p className="entry-form__help">네이버 로그인 후 사전등록을 진행할 수 있어요.</p>
+          </>
         )}
 
-        <div className="entry-form__checkbox-row">
-          <input
-            id={checkboxId}
-            type="checkbox"
-            checked={ageConfirmed}
-            disabled={countdown.isEnded}
-            onChange={(e) => setAgeConfirmed(e.target.checked)}
-          />
-          <label htmlFor={checkboxId}>본인은 만 14세 이상입니다.</label>
-        </div>
-
-        <button type="submit" className="entry-form__submit" disabled={!canSubmit}>
-          {submitting ? '응모 중…' : '응모하기 →'}
-        </button>
-
         <p className="entry-card__caption">TOGETHER FOR A BRIGHTER TOMORROW</p>
-      </form>
+      </div>
 
       <ResultModal
         open={modalMessage !== null}
