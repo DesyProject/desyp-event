@@ -59,10 +59,14 @@ a {
 }
 
 /* ===== Header ===== */
+/* 스크롤해도 화면 위에 고정. 배경 이미지 위에서도 글자가 보이게 반투명 배경을 깐다 */
 .header {
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 20;
   padding: 20px 5vw;
+  background: rgba(5, 8, 20, 0.85);
+  backdrop-filter: blur(10px);
 }
 .header__inner {
   max-width: 1200px;
