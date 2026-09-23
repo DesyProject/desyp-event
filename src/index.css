@@ -133,8 +133,8 @@ a {
   /* 넓은 화면은 가로 꽉 채움. 좁은 화면은 높이를 확보하고 양옆을 잘라 가운데 제목을 살린다 */
   --poster-h: max(calc(100vw * 2 / 3), 560px);
   position: relative;
-  /* 응모 카드는 캐릭터·선물상자 아래(76% 지점)부터 시작 */
-  padding: calc(var(--poster-h) * 0.76) 16px 60px;
+  /* 응모 카드는 70% 지점부터 시작. 캐릭터 발끝이 카드에 살짝 가려진다 */
+  padding: calc(var(--poster-h) * 0.7) 16px 60px;
   background: var(--bg-deep);
   overflow: hidden;
 }
