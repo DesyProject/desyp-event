@@ -380,9 +380,8 @@ a {
 .entry-form__perk {
   float: right;
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 400;
   color: var(--accent-blue-light);
-  text-shadow: 0 0 8px rgba(47, 155, 255, 0.5);
 }
 .entry-form__text {
   width: 100%;
