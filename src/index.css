@@ -128,30 +128,26 @@ a {
 }
 
 /* ===== Hero ===== */
-/* 배경은 포스터 이미지 한 장. 제목·캐릭터·간판이 이미지에 포함돼 있다. */
+/* 배경은 가로 포스터 이미지 한 장(1536x1024). 제목·캐릭터·간판이 이미지에 포함돼 있다. */
 .hero {
-  --poster-w: min(100vw, 900px);
-  --poster-h: calc(var(--poster-w) * 1.5); /* 이미지 비율 1024x1536 */
+  /* 넓은 화면은 가로 꽉 채움. 좁은 화면은 높이를 확보하고 양옆을 잘라 가운데 제목을 살린다 */
+  --poster-h: max(calc(100vw * 2 / 3), 560px);
   position: relative;
-  /* 응모 카드는 포스터의 캐릭터·선물상자 아래(72% 지점)부터 시작 */
-  padding: calc(var(--poster-h) * 0.72) 16px 60px;
+  /* 응모 카드는 캐릭터·선물상자 아래(76% 지점)부터 시작 */
+  padding: calc(var(--poster-h) * 0.76) 16px 60px;
   background: var(--bg-deep);
   overflow: hidden;
 }
-/* 가운데: 원본 포스터. 좌우·아래 가장자리는 페이지 배경색으로 서서히 사라진다 */
 .hero::after {
   content: '';
   position: absolute;
   top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: var(--poster-w);
+  left: 0;
+  width: 100%;
   height: var(--poster-h);
-  background: url('/assets/bg-hero.jpg') center top / 100% auto no-repeat;
-  mask-image:
-    linear-gradient(to bottom, #000 80%, transparent),
-    linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
-  mask-composite: intersect;
+  background: url('/assets/bg-hero.jpg') center top / cover no-repeat;
+  /* 아래 가장자리는 페이지 배경색으로 서서히 사라진다 */
+  mask-image: linear-gradient(to bottom, #000 82%, transparent);
   z-index: 1;
 }
 .entry-card,
