@@ -41,6 +41,16 @@ export default function EntryCard() {
       <p className="entry-card__label">EVENT ENDS IN</p>
 
       <div className="countdown">
+        {/* 마지막 날(0일)에는 일 칸을 숨긴다 */}
+        {countdown.days > 0 && (
+          <div className="countdown__unit countdown__unit--days">
+            <span className="countdown__value">
+              {countdown.days}
+              <span className="countdown__suffix">일</span>
+            </span>
+            <span className="countdown__caption">DAYS</span>
+          </div>
+        )}
         <div className="countdown__unit">
           <span className="countdown__value">{pad2(countdown.hours)}</span>
           <span className="countdown__caption">HOURS</span>
