@@ -861,6 +861,15 @@ a {
     transition: none;
   }
 }
+.prize__tiers {
+  margin: 8px 0 6px;
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  word-break: keep-all;
+}
+.prize__tiers strong {
+  color: var(--accent-blue-light);
+}
 .prize__note {
   color: var(--text-dim);
   opacity: 0.55;

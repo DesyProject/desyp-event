@@ -142,6 +142,9 @@ export default function Prize() {
         </div>
       </div>
 
+      <p className="prize__tiers">
+        선착순·랜덤 당첨자는 <strong>50,000원</strong>, 추천왕은 <strong>30,000원</strong> 상당 상품을 받아요
+      </p>
       <p className="prize__note">당첨자에게 운영자가 직접 연락해 상품을 안내합니다.</p>
     </section>
   )
