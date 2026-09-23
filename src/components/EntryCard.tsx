@@ -9,6 +9,9 @@ import {
 import { pad2, useCountdown } from '../hooks/useCountdown'
 import ResultModal from './ResultModal'
 
+// 형식만 가볍게 확인한다. 실제로 등록된 사람인지는 백엔드가 확인한다
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 /** 백엔드가 로그인 뒤 돌려보낸 ?login=error&reason=... 를 읽고 주소에서 지운다 */
 function consumeLoginError(): string | null {
   const params = new URLSearchParams(window.location.search)
@@ -33,9 +36,7 @@ export default function EntryCard() {
   const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [agreePrivacy, setAgreePrivacy] = useState(false)
   const [agreeMarketing, setAgreeMarketing] = useState(false)
-  // 추천 링크(?ref=코드)로 들어오면 미리 채운다
-  const [referral, setReferral] = useState(() => new URLSearchParams(window.location.search).get('ref') ?? '')
-  const [copied, setCopied] = useState(false)
+  const [referrer, setReferrer] = useState('')
   const [busy, setBusy] = useState(false)
   const [modalMessage, setModalMessage] = useState<string | null>(() => consumeLoginError())
 
@@ -46,18 +47,10 @@ export default function EntryCard() {
   }, [])
 
   const closed = countdown.isEnded
-  const canSubmit = !!me && !me.registered && ageConfirmed && agreePrivacy && !busy && !closed
-
-  async function copyReferralLink(code: string) {
-    const link = `${window.location.origin}${window.location.pathname}?ref=${encodeURIComponent(code)}`
-    try {
-      await navigator.clipboard.writeText(link)
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 2000)
-    } catch {
-      setModalMessage(`아래 링크를 복사해 공유해주세요.\n${link}`)
-    }
-  }
+  const referrerEmail = referrer.trim().toLowerCase()
+  const referrerInvalid = referrerEmail !== '' && !EMAIL_PATTERN.test(referrerEmail)
+  const canSubmit =
+    !!me && !me.registered && ageConfirmed && agreePrivacy && !referrerInvalid && !busy && !closed
 
   async function handleLogin() {
     setBusy(true)
@@ -70,11 +63,15 @@ export default function EntryCard() {
     e.preventDefault()
     if (!canSubmit) return
     setBusy(true)
-    const referralCode = referral.trim().toUpperCase() || undefined
-    const result = await submitPreRegistration({ ageConfirmed, agreePrivacy, agreeMarketing, referralCode })
+    const result = await submitPreRegistration({
+      ageConfirmed,
+      agreePrivacy,
+      agreeMarketing,
+      referrerEmail: referrerEmail || undefined,
+    })
     setBusy(false)
     if (result.kind === 'success' || result.kind === 'already') {
-      setMe((prev) => prev && { ...prev, registered: true, referralCode: result.referralCode ?? prev.referralCode })
+      setMe((prev) => prev && { ...prev, registered: true })
     } else if (result.kind === 'unauthorized') {
       setMe(null)
     }
@@ -125,15 +122,6 @@ export default function EntryCard() {
           <div className="entry-card__status">
             <p className="entry-card__status-title">사전등록 완료!</p>
             <p className="entry-card__status-body">당첨 안내는 {me.emailMasked}로 보내드려요.</p>
-            {me.referralCode && (
-              <div className="referral-share">
-                <span className="referral-share__label">내 추천인 코드</span>
-                <strong className="referral-share__code">{me.referralCode}</strong>
-                <button type="button" className="referral-share__copy" onClick={() => copyReferralLink(me.referralCode!)}>
-                  {copied ? '복사됨!' : '추천 링크 복사'}
-                </button>
-              </div>
-            )}
           </div>
         ) : me ? (
           <form onSubmit={handleSubmit} noValidate>
@@ -143,17 +131,26 @@ export default function EntryCard() {
             </p>
 
             <label htmlFor={referralId} className="entry-form__label">
-              추천인 코드 <span className="entry-form__optional">(선택)</span>
+              추천인 이메일 <span className="entry-form__optional">(선택)</span>
             </label>
             <input
               id={referralId}
+              type="email"
+              inputMode="email"
               className="entry-form__text"
-              value={referral}
-              onChange={(e) => setReferral(e.target.value)}
-              placeholder="예) DESYP7K2"
+              value={referrer}
+              onChange={(e) => setReferrer(e.target.value)}
+              placeholder="나를 추천한 친구의 네이버 이메일"
               autoComplete="off"
-              maxLength={20}
+              maxLength={100}
+              aria-invalid={referrerInvalid}
+              aria-describedby={referrerInvalid ? `${referralId}-hint` : undefined}
             />
+            {referrerInvalid && (
+              <p id={`${referralId}-hint`} className="entry-form__hint">
+                이메일 형식으로 입력해주세요. 예) friend@naver.com
+              </p>
+            )}
 
             <div className="entry-form__checkbox-row">
               <input
