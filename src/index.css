@@ -533,14 +533,13 @@ a {
 }
 
 /* ===== About ===== */
-/* 배경은 이미지 한 장(1959x803). 왼쪽 제목·문구와 뒷모습 캐릭터가 이미지에 포함돼 있다.
-   HTML 제목(.about__left)은 화면 낭독기용으로만 남기고, 카드는 오른쪽 칸에 둔다 */
+/* 배경 이미지(1961x802)에는 글자가 없다. 왼쪽은 소개 문구, 오른쪽은 상품 카드와 유의 사항 */
 .about {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 60px;
   align-items: center;
-  min-height: calc(100vw * 803 / 1959);
+  min-height: calc(100vw * 802 / 1961);
   isolation: isolate;
 }
 .about::before {
@@ -560,21 +559,35 @@ a {
 .section.about {
   margin-top: -80px;
 }
-.about__right {
-  grid-column: 2;
-}
+/* 캐릭터 머리 위 하늘 부분에만 글자가 오도록 위쪽에 붙인다 */
 .about__left {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
+  align-self: start;
+  /* 별 하늘 위에서도 글자가 또렷하게 */
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+}
+.about__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 4.4vw, 3.6rem);
+  line-height: 1.1;
+  margin: 0 0 20px;
+}
+.about__desc {
+  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+  font-weight: 700;
+  line-height: 1.5;
+  margin: 0 0 14px;
+}
+.about__desc--sub {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: #c9d2ee;
+  margin-bottom: 24px;
 }
 .about__right {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 .info-card {
   display: flex;
@@ -585,30 +598,78 @@ a {
   backdrop-filter: blur(6px);
   border: 1px solid var(--card-border);
   border-radius: 14px;
-  padding: 20px;
+  padding: 18px 20px;
 }
 .info-card__icon {
   width: 48px;
   height: 48px;
   flex-shrink: 0;
 }
+.info-card__text {
+  flex: 1;
+  min-width: 0;
+}
 .info-card__title {
   margin: 0 0 4px;
-  font-size: 1rem;
+  font-size: 1.05rem;
 }
 .info-card__body {
   margin: 0;
   color: var(--text-dim);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   line-height: 1.5;
 }
-.about__handwritten {
-  align-self: flex-end;
-  font-family: var(--font-hand);
-  font-size: 1.1rem;
+.info-card__prize {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
   color: var(--accent-blue-light);
-  text-shadow: 0 0 6px #000, 0 0 12px #000;
-  margin: 8px 0 0;
+  text-align: right;
+  white-space: nowrap;
+}
+.info-card__body,
+.notice,
+.privacy,
+.about__desc {
+  word-break: keep-all; /* 한국어 단어 중간에서 줄이 꺾이지 않게 */
+}
+.notice,
+.privacy {
+  background: rgba(8, 12, 36, 0.78);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 16px 20px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+.notice__title {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  color: #ffcf70;
+}
+.notice__list {
+  margin: 0;
+  padding-left: 18px;
+  color: #d6dcf2;
+}
+.privacy summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+.privacy dl {
+  margin: 12px 0 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  color: var(--text-dim);
+}
+.privacy dt {
+  font-weight: 700;
+  color: var(--text-white);
+}
+.privacy dd {
+  margin: 0;
 }
 
 /* ===== Prize ===== */
@@ -851,21 +912,10 @@ a {
   }
   .section.about {
     display: grid;
-    min-height: max(calc(100vw * 803 / 1959), calc(100svh - 80px));
+    min-height: max(calc(100vw * 802 / 1961), calc(100svh - 80px));
   }
   .section.faq {
     min-height: 0; /* FAQ는 휠 넘김 없이 평소처럼 스크롤한다 */
-  }
-  /* 배경 속 제목이 화면 왼쪽에 너무 붙지 않게 이미지를 오른쪽으로 민다.
-     비는 왼쪽 끝은 페이지 배경색으로 서서히 이어진다 */
-  .about::before {
-    /* 섹션이 화면 높이만큼 커지면 이미지가 확대되는데, 왼쪽 기준으로 맞춰 글자 쪽이 잘리지 않게 한다 */
-    background-position: left center;
-    transform: translateX(calc(-50% + 4vw));
-    mask-image:
-      linear-gradient(to bottom, transparent, #000 8%, #000 90%, transparent),
-      linear-gradient(to right, transparent, #000 5%);
-    mask-composite: intersect;
   }
 }
 
@@ -889,21 +939,15 @@ a {
     gap: 16px;
     border-bottom: 1px solid var(--card-border);
   }
-  /* 좁은 화면: 이미지 왼쪽(글자 부분)을 위쪽 배너로 보여주고 카드는 그 아래에 둔다 */
+  /* 좁은 화면: 소개 문구 아래에 카드를 쌓고, 배경은 캐릭터가 보이게 왼쪽 기준으로 깐다 */
   .section.about {
     grid-template-columns: 1fr;
+    gap: 32px;
     min-height: 0;
     margin-top: -60px;
-    padding-top: 440px;
   }
   .about::before {
-    bottom: auto;
-    height: 460px;
-    background-size: auto 100%;
-    background-position: left top;
-  }
-  .about__right {
-    grid-column: auto;
+    background-position: 25% center;
   }
 }
 
