@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- De_sy_P 로고. 원본 PNG를 보고 다시 그린 벡터 버전 -->
+  <defs>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1e7bff"/>
+      <stop offset="1" stop-color="#5b3dd6"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a9bff"/>
+      <stop offset="1" stop-color="#2f6bff"/>
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="48.5" fill="#000" stroke="url(#rim)" stroke-width="2"/>
+  <!-- 안쪽 링: 글자 양옆은 비운다 -->
+  <path d="M18.6 40 A33 33 0 0 1 81.4 40" fill="none" stroke="url(#ring)" stroke-width="0.9"/>
+  <path d="M18.6 59 A33 33 0 0 0 81.4 59" fill="none" stroke="url(#ring)" stroke-width="0.9"/>
+  <!-- 점선 연결선 -->
+  <g stroke="#fff" stroke-width="0.6" stroke-dasharray="0.8 1.2" opacity="0.85">
+    <path d="M50 19.5V41 M47.5 18.5L24.5 31.5 M52.5 18.5L75.5 31.5 M24.5 34L33 40.5 M75.5 34L67 40.5"/>
+    <path d="M50 80.5V59 M47.5 81.5L24.5 68.5 M52.5 81.5L75.5 68.5 M24.5 66L33 59.5 M75.5 66L67 59.5"/>
+  </g>
+  <!-- 노드 -->
+  <g fill="#000" stroke="#fff" stroke-width="1.1">
+    <circle cx="50" cy="16.5" r="3"/>
+    <circle cx="22" cy="32.5" r="3"/>
+    <circle cx="78" cy="32.5" r="3"/>
+    <circle cx="22" cy="66" r="3"/>
+    <circle cx="78" cy="66" r="3"/>
+    <circle cx="50" cy="82" r="3" stroke="#7aa8ff"/>
+  </g>
+  <!-- 글자 -->
+  <g fill="#fff" font-family="Pretendard, 'Helvetica Neue', Arial, sans-serif" font-weight="600" font-size="17">
+    <text x="13.5" y="55">De</text>
+    <text x="45.5" y="55">sy</text>
+    <text x="75" y="55">P</text>
+  </g>
+  <!-- 글자 사이 파란 연결선 -->
+  <g stroke="#1e6bff" stroke-width="0.9" fill="#1e6bff">
+    <line x1="36.5" y1="54" x2="44" y2="54"/>
+    <circle cx="36.5" cy="54" r="1.3"/>
+    <circle cx="44" cy="54" r="1.3"/>
+    <line x1="64.5" y1="54" x2="74" y2="54"/>
+    <circle cx="64.5" cy="54" r="1.3"/>
+    <circle cx="74" cy="54" r="1.3"/>
+  </g>
+</svg>

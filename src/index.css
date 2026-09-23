@@ -80,13 +80,9 @@ a {
   white-space: nowrap;
 }
 .header__logo {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  border: 2px solid var(--accent-blue-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   box-shadow: 0 0 12px var(--accent-blue);
 }
 .header__nav {
@@ -135,7 +131,7 @@ a {
   --poster-crop-top: 10px; /* 이미지 윗부분을 잘라내는 양 */
   position: relative;
   /* 응모 카드는 62% 지점부터 시작. 캐릭터 하반신이 카드에 일부 가려진다 */
-  padding: calc(var(--poster-h) * 0.62 - var(--poster-crop-top) - 35px) 16px 60px;
+  padding: calc(var(--poster-h) * 0.62 - var(--poster-crop-top) - 50px) 16px 60px;
   background: var(--bg-deep);
   overflow: hidden;
 }

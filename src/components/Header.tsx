@@ -14,9 +14,7 @@ export default function Header() {
     <header className="header">
       <div className="header__inner">
         <a href="#hero" className="header__brand" onClick={() => setMenuOpen(false)}>
-          <span className="header__logo" aria-hidden="true">
-            D
-          </span>
+          <img className="header__logo" src="/assets/logo.svg" alt="" width={40} height={40} />
           De_sy_P
         </a>
 
