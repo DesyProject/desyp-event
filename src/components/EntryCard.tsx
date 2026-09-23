@@ -50,7 +50,14 @@ export default function EntryCard() {
   const referrerEmail = referrer.trim().toLowerCase()
   const referrerInvalid = referrerEmail !== '' && !EMAIL_PATTERN.test(referrerEmail)
   const canSubmit =
-    !!me && !me.registered && ageConfirmed && agreePrivacy && !referrerInvalid && !busy && !closed
+    !!me &&
+    !me.registered &&
+    ageConfirmed &&
+    agreePrivacy &&
+    agreeMarketing &&
+    !referrerInvalid &&
+    !busy &&
+    !closed
 
   async function handleLogin() {
     setBusy(true)
@@ -179,7 +186,7 @@ export default function EntryCard() {
                 checked={agreeMarketing}
                 onChange={(e) => setAgreeMarketing(e.target.checked)}
               />
-              <label htmlFor={marketingId}>[선택] 오픈 소식 알림 수신에 동의합니다.</label>
+              <label htmlFor={marketingId}>[필수] 오픈 소식 알림 수신에 동의합니다.</label>
             </div>
 
             <button type="submit" className="entry-form__submit" disabled={!canSubmit}>
