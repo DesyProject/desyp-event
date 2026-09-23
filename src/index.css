@@ -344,6 +344,7 @@ a {
   font-variant-numeric: tabular-nums;
 }
 .entry-form__account-label {
+  white-space: nowrap;
   font-size: 0.8rem;
   font-weight: 500;
   color: #03c75a;
@@ -375,6 +376,13 @@ a {
 .entry-form__optional {
   font-weight: 400;
   color: var(--text-dim);
+}
+.entry-form__perk {
+  float: right;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-blue-light);
+  text-shadow: 0 0 8px rgba(47, 155, 255, 0.5);
 }
 .entry-form__text {
   width: 100%;
@@ -900,6 +908,11 @@ a {
 }
 
 @media (max-width: 480px) {
+  .entry-form__perk {
+    float: none;
+    display: block;
+    margin-top: 4px;
+  }
   .header {
     padding: 16px;
   }

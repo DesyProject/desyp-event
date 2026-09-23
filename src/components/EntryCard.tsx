@@ -139,6 +139,7 @@ export default function EntryCard() {
 
             <label htmlFor={referralId} className="entry-form__label">
               추천인 이메일 <span className="entry-form__optional">(선택)</span>
+              <span className="entry-form__perk">입력하면 나도 추천 점수를 받아요!</span>
             </label>
             <input
               id={referralId}
