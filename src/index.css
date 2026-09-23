@@ -733,7 +733,8 @@ a {
 }
 .prize__note {
   color: var(--text-dim);
-  font-size: 0.9rem;
+  opacity: 0.55;
+  font-size: 0.85rem;
 }
 
 /* ===== FAQ ===== */
