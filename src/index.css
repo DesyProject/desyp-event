@@ -139,6 +139,21 @@ a {
   background: var(--bg-deep);
   overflow: hidden;
 }
+/* 히어로 이미지 아래 빈 띠: 같은 이미지를 뒤집어 흐리게 비춰 다음 섹션까지 빛을 잇는다 */
+.hero::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: calc(var(--poster-h) * 0.72);
+  bottom: 0;
+  background: url('/assets/bg-hero.jpg') center bottom / cover no-repeat;
+  transform: scaleY(-1);
+  filter: blur(28px) brightness(0.55);
+  /* 뒤집혀 있으므로 요소 기준 아래쪽(화면 기준 위쪽)이 진하다 */
+  mask-image: linear-gradient(to bottom, transparent, #000 85%);
+  z-index: 0;
+}
 .hero::after {
   content: '';
   position: absolute;
@@ -148,7 +163,7 @@ a {
   height: var(--poster-h);
   background: url('/assets/bg-hero.jpg') center top / cover no-repeat;
   /* 아래 가장자리는 페이지 배경색으로 서서히 사라진다 */
-  mask-image: linear-gradient(to bottom, #000 82%, transparent);
+  mask-image: linear-gradient(to bottom, #000 70%, transparent);
   z-index: 1;
 }
 .entry-card,
@@ -428,60 +443,56 @@ a {
 }
 
 /* ===== About ===== */
+/* 배경은 이미지 한 장(1959x803). 왼쪽 제목·문구와 뒷모습 캐릭터가 이미지에 포함돼 있다.
+   HTML 제목(.about__left)은 화면 낭독기용으로만 남기고, 카드는 오른쪽 칸에 둔다 */
 .about {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 60px;
+  align-items: center;
+  min-height: calc(100vw * 803 / 1959);
+  isolation: isolate;
 }
-.about__title {
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
-  margin: 0 0 16px;
+.about::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: url('/assets/bg-about.jpg') center / cover no-repeat;
+  /* 위아래 가장자리는 페이지 배경색으로 서서히 사라진다 */
+  mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 90%, transparent);
+  z-index: -1;
 }
-.about__desc {
-  color: var(--text-dim);
-  line-height: 1.6;
-  margin: 0 0 24px;
+/* 히어로와 살짝 겹치게 위로 당긴다 */
+.section.about {
+  margin-top: -80px;
 }
-.about__divider {
-  border: none;
-  border-top: 1px solid var(--card-border);
-  width: 60px;
-  margin: 0 0 24px;
+.about__right {
+  grid-column: 2;
 }
-.about__tagline {
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
-  color: var(--text-dim);
-  line-height: 1.8;
+.about__left {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 .about__right {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
-.about-decor {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 5vw;
-}
-.about-decor__character {
-  width: min(18vw, 220px);
-  height: auto;
-}
-@media (max-width: 768px) {
-  .about-decor {
-    display: none;
-  }
-}
 .info-card {
   display: flex;
   gap: 16px;
   align-items: flex-start;
-  background: var(--card-bg);
+  /* 배경 이미지 위에서도 글자가 잘 읽히게 진하게 */
+  background: rgba(8, 12, 36, 0.78);
+  backdrop-filter: blur(6px);
   border: 1px solid var(--card-border);
   border-radius: 14px;
   padding: 20px;
@@ -512,6 +523,7 @@ a {
   font-family: var(--font-hand);
   font-size: 1.1rem;
   color: var(--accent-blue-light);
+  text-shadow: 0 0 6px #000, 0 0 12px #000;
   margin: 8px 0 0;
 }
 
@@ -618,8 +630,21 @@ a {
     gap: 16px;
     border-bottom: 1px solid var(--card-border);
   }
-  .about {
+  /* 좁은 화면: 이미지 왼쪽(글자 부분)을 위쪽 배너로 보여주고 카드는 그 아래에 둔다 */
+  .section.about {
     grid-template-columns: 1fr;
+    min-height: 0;
+    margin-top: -60px;
+    padding-top: 440px;
+  }
+  .about::before {
+    bottom: auto;
+    height: 460px;
+    background-size: auto 100%;
+    background-position: left top;
+  }
+  .about__right {
+    grid-column: auto;
   }
 }
 

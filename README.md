@@ -35,7 +35,7 @@ Instagram ID 입력값으로 응답을 강제할 수 있다 (`src/api/entry.ts`)
 ## 이미지 에셋 교체
 
 - `bg-hero.jpg` — 히어로 배경 포스터 (가로 1536x1024). 제목·캐릭터·간판·선물상자가 이미지에 포함돼 있다. 비율이 다른 이미지로 바꾸면 `src/index.css`의 `.hero`의 `--poster-h` 비율(2/3)을 맞춘다
-- `character-3.png` — 이벤트 안내 섹션 캐릭터. 아직 1x1 투명 placeholder라 같은 파일명으로 덮어쓰면 반영된다
+- `bg-about.jpg` — 이벤트 안내 섹션 배경 (1959x803). 제목·문구·뒷모습 캐릭터가 이미지에 포함돼 있다. 비율이 바뀌면 `.about`의 `min-height` 비율을 맞춘다
 
 ## 배포 (Vercel)
 
