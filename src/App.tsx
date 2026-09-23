@@ -5,8 +5,11 @@ import Footer from './components/Footer'
 import Header from './components/Header'
 import Hero from './components/Hero'
 import Prize from './components/Prize'
+import { useWheelSectionScroll } from './hooks/useWheelSectionScroll'
 
 export default function App() {
+  useWheelSectionScroll('.hero, .section, .footer')
+
   return (
     <>
       <Header />
