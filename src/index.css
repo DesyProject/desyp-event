@@ -172,6 +172,8 @@ a {
 .entry-card {
   max-width: 520px;
   margin: 0 auto;
+  /* PLAY TOGETHER로 이동할 때 카드 위 캐릭터 얼굴까지 보이게 여유를 둔다 */
+  scroll-margin-top: max(16vw, 110px);
   background: var(--card-bg);
   border: 2px solid var(--card-border);
   border-radius: 12px;
