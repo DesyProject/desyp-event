@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 
-const DURATION_MS = 1100 // 한 구간을 넘어가는 시간. 클수록 살살 넘어간다
+const LOCK_MS = 900 // 한 번 넘긴 뒤 다음 휠 입력을 받기까지
+const MERGE_PX = 200 // 이보다 가까운 멈춤 지점은 하나로 합친다 (짧게 걸리는 느낌 방지)
 const INERTIA_GAP_MS = 150 // 트랙패드 관성 입력이 이만큼 끊겨야 다음 넘김을 받는다
 
 /**
@@ -14,21 +15,6 @@ export function useWheelSectionScroll(selector: string) {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     let lockedUntil = 0
-    let frame = 0
-
-    // 천천히 출발해서 천천히 멈춘다
-    const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2)
-    const animateTo = (target: number) => {
-      const start = window.scrollY
-      const t0 = performance.now()
-      cancelAnimationFrame(frame)
-      const step = (now: number) => {
-        const t = Math.min((now - t0) / DURATION_MS, 1)
-        window.scrollTo({ top: start + (target - start) * ease(t), behavior: 'instant' })
-        if (t < 1) frame = requestAnimationFrame(step)
-      }
-      frame = requestAnimationFrame(step)
-    }
 
     const stops = () => {
       const headerH = document.querySelector('.header')?.getBoundingClientRect().height ?? 0
@@ -41,7 +27,15 @@ export function useWheelSectionScroll(selector: string) {
         const extra = el.offsetHeight - view
         if (extra > 40) points.push(top + extra)
       })
-      return [...new Set(points.map((p) => Math.round(Math.min(Math.max(p, 0), max))))].sort((a, b) => a - b)
+      const sorted = points.map((p) => Math.round(Math.min(Math.max(p, 0), max))).sort((a, b) => a - b)
+      // 가까운 지점은 합치되, 맨 끝(페이지 바닥)은 항상 남긴다
+      const kept: number[] = []
+      for (const p of sorted) {
+        const close = kept.length > 0 && p - kept[kept.length - 1] <= MERGE_PX
+        if (!close) kept.push(p)
+        else if (p === max) kept[kept.length - 1] = p
+      }
+      return kept
     }
 
     const onWheel = (e: WheelEvent) => {
@@ -58,14 +52,11 @@ export function useWheelSectionScroll(selector: string) {
       const points = stops()
       const target = e.deltaY > 0 ? points.find((p) => p > y + 5) : points.reverse().find((p) => p < y - 5)
       if (target === undefined) return
-      lockedUntil = now + DURATION_MS
-      animateTo(target)
+      lockedUntil = now + LOCK_MS
+      window.scrollTo({ top: target, behavior: 'smooth' })
     }
 
     window.addEventListener('wheel', onWheel, { passive: false })
-    return () => {
-      window.removeEventListener('wheel', onWheel)
-      cancelAnimationFrame(frame)
-    }
+    return () => window.removeEventListener('wheel', onWheel)
   }, [selector])
 }

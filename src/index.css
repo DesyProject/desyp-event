@@ -796,6 +796,24 @@ a {
   margin: 0;
 }
 
+/* 마우스 화면: 휠 한 번에 한 화면씩 넘어가도록 섹션마다 최소 화면 한 칸 높이를 준다 (헤더 80px 제외) */
+@media (pointer: fine) and (min-width: 1025px) {
+  .section {
+    min-height: calc(100svh - 80px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .section.about {
+    display: grid;
+    min-height: max(calc(100vw * 803 / 1959), calc(100svh - 80px));
+  }
+  /* 마지막 FAQ는 푸터까지 합쳐 한 화면 */
+  .section.faq {
+    min-height: calc(100svh - 80px - 152px);
+  }
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 1024px) {
   .header__nav {
