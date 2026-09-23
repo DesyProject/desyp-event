@@ -135,7 +135,7 @@ a {
   --poster-crop-top: 10px; /* 이미지 윗부분을 잘라내는 양 */
   position: relative;
   /* 응모 카드는 62% 지점부터 시작. 캐릭터 하반신이 카드에 일부 가려진다 */
-  padding: calc(var(--poster-h) * 0.62 - var(--poster-crop-top)) 16px 60px;
+  padding: calc(var(--poster-h) * 0.62 - var(--poster-crop-top) - 15px) 16px 60px;
   background: var(--bg-deep);
   overflow: hidden;
 }
