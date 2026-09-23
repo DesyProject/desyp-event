@@ -132,16 +132,17 @@ a {
 .hero {
   /* 넓은 화면은 가로 꽉 채움. 좁은 화면은 높이를 확보하고 양옆을 잘라 가운데 제목을 살린다 */
   --poster-h: max(calc(100vw * 2 / 3), 560px);
+  --poster-crop-top: 10px; /* 이미지 윗부분을 잘라내는 양 */
   position: relative;
   /* 응모 카드는 62% 지점부터 시작. 캐릭터 하반신이 카드에 일부 가려진다 */
-  padding: calc(var(--poster-h) * 0.62) 16px 60px;
+  padding: calc(var(--poster-h) * 0.62 - var(--poster-crop-top)) 16px 60px;
   background: var(--bg-deep);
   overflow: hidden;
 }
 .hero::after {
   content: '';
   position: absolute;
-  top: 0;
+  top: calc(var(--poster-crop-top) * -1);
   left: 0;
   width: 100%;
   height: var(--poster-h);
