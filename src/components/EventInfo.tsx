@@ -1,8 +1,8 @@
 const INFO_ITEMS = [
-  { icon: '👥', title: '참여 대상', body: '만 14세 이상 (네이버 로그인)' },
-  { icon: '🗄️', title: '수집 정보', body: '휴대전화번호 (네이버 계정에서 제공)' },
+  { icon: 'people', title: '참여 대상', body: '만 14세 이상 (네이버 로그인)' },
+  { icon: 'database', title: '수집 정보', body: '휴대전화번호 (네이버 계정에서 제공)' },
   {
-    icon: '📄',
+    icon: 'document',
     title: '이용 목적',
     body: (
       <>
@@ -41,9 +41,7 @@ export default function EventInfo() {
       <div className="about__right">
         {INFO_ITEMS.map((item) => (
           <div className="info-card" key={item.title}>
-            <span className="info-card__icon" aria-hidden="true">
-              {item.icon}
-            </span>
+            <img className="info-card__icon" src={`/assets/icon-${item.icon}.svg`} alt="" width={48} height={48} />
             <div>
               <h3 className="info-card__title">{item.title}</h3>
               <p className="info-card__body">{item.body}</p>
@@ -51,9 +49,7 @@ export default function EventInfo() {
           </div>
         ))}
         <div className="info-card">
-          <span className="info-card__icon" aria-hidden="true">
-            ⏱️
-          </span>
+          <img className="info-card__icon" src="/assets/icon-clock.svg" alt="" width={48} height={48} />
           <div>
             <h3 className="info-card__title">보유 기간</h3>
             <p className="info-card__body">이벤트 종료 후 {retentionDays}일 이내 파기</p>
