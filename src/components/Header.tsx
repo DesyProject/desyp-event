@@ -61,7 +61,7 @@ export default function Header() {
         </nav>
 
         <a href="#entry-card" className="header__cta">
-          사전등록하기 →
+          JOIN EVENT →
         </a>
 
         <button
