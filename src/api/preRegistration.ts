@@ -4,27 +4,41 @@
  */
 
 export interface Me {
-  /** 가운데를 가린 번호. 예) 010-****-5678. 원래 번호는 브라우저로 내려오지 않는다 */
-  phoneMasked: string
+  /** 연락받을 네이버 이메일, 가운데를 가린 형태. 예) des***@naver.com */
+  emailMasked: string
   registered: boolean
+  /** 등록을 마친 사람의 추천인 코드. 등록 전에는 없다 */
+  referralCode?: string
 }
 
 export interface PreRegistrationRequest {
   ageConfirmed: boolean
   agreePrivacy: boolean
   agreeMarketing: boolean
+  /** 추천해준 사람의 코드. 선택 */
+  referralCode?: string
 }
-
-export type SubmitKind = 'success' | 'already' | 'closed' | 'unauthorized' | 'rate_limited' | 'error'
 
 export interface SubmitResult {
   kind: SubmitKind
   message: string
+  /** 등록에 성공하면 백엔드가 내려주는 내 추천인 코드 */
+  referralCode?: string
 }
+
+export type SubmitKind =
+  | 'success'
+  | 'already'
+  | 'invalid_referral'
+  | 'closed'
+  | 'unauthorized'
+  | 'rate_limited'
+  | 'error'
 
 const MESSAGES: Record<SubmitKind, string> = {
   success: '사전등록이 완료되었습니다. 오픈 소식을 가장 먼저 알려드릴게요!',
-  already: '이미 사전등록한 계정입니다.',
+  already: '이미 사전등록했습니다. 한 사람당 한 번만 참여할 수 있어요.',
+  invalid_referral: '추천인 코드를 찾을 수 없습니다. 다시 확인해주세요.',
   closed: '사전등록이 마감되었습니다.',
   unauthorized: '로그인이 만료되었습니다. 네이버 로그인을 다시 해주세요.',
   rate_limited: '잠시 후 다시 시도해주세요.',
@@ -33,6 +47,7 @@ const MESSAGES: Record<SubmitKind, string> = {
 
 const STATUS_KIND: Record<number, SubmitKind> = {
   401: 'unauthorized',
+  404: 'invalid_referral',
   409: 'already',
   410: 'closed',
   429: 'rate_limited',
@@ -40,7 +55,8 @@ const STATUS_KIND: Record<number, SubmitKind> = {
 
 /** 백엔드가 로그인 실패 시 돌려보내는 ?login=error&reason=... 의 reason별 안내 */
 export const LOGIN_ERROR_MESSAGES: Record<string, string> = {
-  no_phone: '휴대전화번호 제공에 동의해야 사전등록할 수 있습니다.',
+  no_phone: '휴대전화번호 제공에 동의해야 사전등록할 수 있습니다. 중복 참여 확인에만 쓰고 연락에는 사용하지 않아요.',
+  no_email: '이메일 제공에 동의해야 사전등록할 수 있습니다. 당첨 안내를 이메일로 드려요.',
   cancelled: '네이버 로그인이 취소되었습니다.',
   default: '네이버 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.',
 }
@@ -67,7 +83,8 @@ export async function startNaverLogin(): Promise<void> {
 /** 로그인 안 됐으면 null */
 export async function fetchMe(): Promise<Me | null> {
   if (isMock) {
-    return mock.loggedIn ? { phoneMasked: '010-****-5678', registered: mock.registered } : null
+    if (!mock.loggedIn) return null
+    return { emailMasked: 'des***@naver.com', registered: mock.registered, referralCode: mock.registered ? 'DESYP7K2' : undefined }
   }
   const res = await fetch(`${API_BASE_URL}/api/me`, { credentials: 'include' })
   if (res.status === 401) return null
@@ -78,8 +95,10 @@ export async function fetchMe(): Promise<Me | null> {
 export async function submitPreRegistration(req: PreRegistrationRequest): Promise<SubmitResult> {
   if (isMock) {
     await new Promise((r) => setTimeout(r, 600))
+    // 목업 테스트용: 추천인 코드에 "WRONG"을 넣으면 잘못된 코드 응답
+    if (req.referralCode === 'WRONG') return { kind: 'invalid_referral', message: MESSAGES.invalid_referral }
     mock.registered = true
-    return { kind: 'success', message: MESSAGES.success }
+    return { kind: 'success', message: MESSAGES.success, referralCode: 'DESYP7K2' }
   }
 
   try {
@@ -89,14 +108,14 @@ export async function submitPreRegistration(req: PreRegistrationRequest): Promis
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req),
     })
-    let body: { message?: string | null } = {}
+    let body: { message?: string | null; referralCode?: string } = {}
     try {
       body = await res.json()
     } catch {
       // 본문이 없어도 status 코드로 판단한다
     }
     const kind: SubmitKind = res.ok ? 'success' : (STATUS_KIND[res.status] ?? 'error')
-    return { kind, message: body.message ?? MESSAGES[kind] }
+    return { kind, message: body.message ?? MESSAGES[kind], referralCode: body.referralCode }
   } catch {
     return { kind: 'error', message: MESSAGES.error }
   }

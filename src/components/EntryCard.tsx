@@ -26,12 +26,16 @@ export default function EntryCard() {
   const ageId = useId()
   const privacyId = useId()
   const marketingId = useId()
+  const referralId = useId()
 
   // undefined: 로그인 여부 확인 중, null: 로그인 전
   const [me, setMe] = useState<Me | null | undefined>(undefined)
   const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [agreePrivacy, setAgreePrivacy] = useState(false)
   const [agreeMarketing, setAgreeMarketing] = useState(false)
+  // 추천 링크(?ref=코드)로 들어오면 미리 채운다
+  const [referral, setReferral] = useState(() => new URLSearchParams(window.location.search).get('ref') ?? '')
+  const [copied, setCopied] = useState(false)
   const [busy, setBusy] = useState(false)
   const [modalMessage, setModalMessage] = useState<string | null>(() => consumeLoginError())
 
@@ -44,6 +48,17 @@ export default function EntryCard() {
   const closed = countdown.isEnded
   const canSubmit = !!me && !me.registered && ageConfirmed && agreePrivacy && !busy && !closed
 
+  async function copyReferralLink(code: string) {
+    const link = `${window.location.origin}${window.location.pathname}?ref=${encodeURIComponent(code)}`
+    try {
+      await navigator.clipboard.writeText(link)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 2000)
+    } catch {
+      setModalMessage(`아래 링크를 복사해 공유해주세요.\n${link}`)
+    }
+  }
+
   async function handleLogin() {
     setBusy(true)
     await startNaverLogin() // 실제 모드는 여기서 네이버로 페이지가 이동한다
@@ -55,10 +70,11 @@ export default function EntryCard() {
     e.preventDefault()
     if (!canSubmit) return
     setBusy(true)
-    const result = await submitPreRegistration({ ageConfirmed, agreePrivacy, agreeMarketing })
+    const referralCode = referral.trim().toUpperCase() || undefined
+    const result = await submitPreRegistration({ ageConfirmed, agreePrivacy, agreeMarketing, referralCode })
     setBusy(false)
     if (result.kind === 'success' || result.kind === 'already') {
-      setMe((prev) => prev && { ...prev, registered: true })
+      setMe((prev) => prev && { ...prev, registered: true, referralCode: result.referralCode ?? prev.referralCode })
     } else if (result.kind === 'unauthorized') {
       setMe(null)
     }
@@ -108,14 +124,36 @@ export default function EntryCard() {
         ) : me?.registered ? (
           <div className="entry-card__status">
             <p className="entry-card__status-title">사전등록 완료!</p>
-            <p className="entry-card__status-body">오픈 소식을 가장 먼저 알려드릴게요.</p>
+            <p className="entry-card__status-body">당첨 안내는 {me.emailMasked}로 보내드려요.</p>
+            {me.referralCode && (
+              <div className="referral-share">
+                <span className="referral-share__label">내 추천인 코드</span>
+                <strong className="referral-share__code">{me.referralCode}</strong>
+                <button type="button" className="referral-share__copy" onClick={() => copyReferralLink(me.referralCode!)}>
+                  {copied ? '복사됨!' : '추천 링크 복사'}
+                </button>
+              </div>
+            )}
           </div>
         ) : me ? (
           <form onSubmit={handleSubmit} noValidate>
             <p className="entry-form__account">
               <span className="entry-form__account-label">네이버 계정 연결됨</span>
-              {me.phoneMasked}
+              {me.emailMasked}
             </p>
+
+            <label htmlFor={referralId} className="entry-form__label">
+              추천인 코드 <span className="entry-form__optional">(선택)</span>
+            </label>
+            <input
+              id={referralId}
+              className="entry-form__text"
+              value={referral}
+              onChange={(e) => setReferral(e.target.value)}
+              placeholder="예) DESYP7K2"
+              autoComplete="off"
+              maxLength={20}
+            />
 
             <div className="entry-form__checkbox-row">
               <input

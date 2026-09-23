@@ -8,7 +8,7 @@ import Prize from './components/Prize'
 import { useWheelSectionScroll } from './hooks/useWheelSectionScroll'
 
 export default function App() {
-  useWheelSectionScroll('.hero, .section, .footer')
+  useWheelSectionScroll('.hero, .about, .prize, .faq', '.faq')
 
   return (
     <>
