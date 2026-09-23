@@ -777,6 +777,12 @@ a {
   color: var(--accent-blue-light);
   font-variant-numeric: tabular-nums;
 }
+.gift-card__amount-sub {
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(154, 165, 201, 0.4);
+  color: var(--text-dim);
+}
 .gift-card__footer {
   display: flex;
   justify-content: space-between;
