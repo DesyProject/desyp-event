@@ -12,6 +12,7 @@ const PRIZES = [
   '쿠팡',
 ]
 
+const PRIZE_AMOUNT = '50,000원' // 모든 상품 금액이 같다
 const AUTOPLAY_MS = 3000
 const VISIBLE_RANGE = 2 // 가운데 기준 좌우로 보이는 카드 수
 const SWIPE_PX = 40
@@ -92,7 +93,10 @@ export default function Prize() {
                 onClick={() => offset !== 0 && go(offset)}
               >
                 <span className="gift-card__label">GIFTICON</span>
-                <span className="gift-card__name">{name}</span>
+                <span className="gift-card__body">
+                  <span className="gift-card__name">{name}</span>
+                  <span className="gift-card__amount">{PRIZE_AMOUNT}</span>
+                </span>
                 <span className="gift-card__footer">
                   <span>De_sy_P PRIZE</span>
                   <span className="gift-card__chip" aria-hidden="true" />
