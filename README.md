@@ -34,13 +34,8 @@ Instagram ID 입력값으로 응답을 강제할 수 있다 (`src/api/entry.ts`)
 
 ## 이미지 에셋 교체
 
-`public/assets/`에 1x1 투명 PNG placeholder가 들어있다. 실제 파일을 같은 파일명으로 덮어쓰면 바로 반영된다:
-
-- `character-1.png` — 히어로 메인 캐릭터
-- `character-2.png` — 히어로 좌하단 보조 캐릭터
-- `character-3.png` — 이벤트 안내 섹션 캐릭터
-- `gift-box.png` — 물음표 선물 상자
-- `bg-hero.jpg` — 히어로 배경 블록 도시 (없어도 그라데이션 배경으로 자연스럽게 대체됨)
+- `bg-hero.jpg` — 히어로 배경 포스터 (1024x1536). 제목·캐릭터·간판·선물상자가 이미지에 포함돼 있다. 비율이 다른 이미지로 바꾸면 `src/index.css`의 `--poster-h`를 맞춘다
+- `character-3.png` — 이벤트 안내 섹션 캐릭터. 아직 1x1 투명 placeholder라 같은 파일명으로 덮어쓰면 반영된다
 
 ## 배포 (Vercel)
 

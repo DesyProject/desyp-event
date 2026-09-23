@@ -128,129 +128,53 @@ a {
 }
 
 /* ===== Hero ===== */
+/* 배경은 포스터 이미지 한 장. 제목·캐릭터·간판이 이미지에 포함돼 있다. */
 .hero {
+  --poster-w: min(100vw, 900px);
+  --poster-h: calc(var(--poster-w) * 1.5); /* 이미지 비율 1024x1536 */
   position: relative;
-  padding: 40px 5vw 60px;
-  background:
-    radial-gradient(circle at 20% 10%, rgba(107, 77, 255, 0.25), transparent 45%),
-    radial-gradient(circle at 80% 0%, rgba(30, 123, 255, 0.3), transparent 40%),
-    linear-gradient(180deg, var(--bg-navy), var(--bg-deep));
+  /* 응모 카드는 포스터의 캐릭터·선물상자 아래(72% 지점)부터 시작 */
+  padding: calc(var(--poster-h) * 0.72) 16px 60px;
+  background: var(--bg-deep);
   overflow: hidden;
 }
-.hero::before {
+/* 가운데: 원본 포스터. 좌우·아래 가장자리는 페이지 배경색으로 서서히 사라진다 */
+.hero::after {
   content: '';
   position: absolute;
-  inset: 0;
-  background: url('/assets/bg-hero.jpg') center/cover no-repeat;
-  opacity: 0.55;
-  z-index: 0;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--poster-w);
+  height: var(--poster-h);
+  background: url('/assets/bg-hero.jpg') center top / 100% auto no-repeat;
+  mask-image:
+    linear-gradient(to bottom, #000 80%, transparent),
+    linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-composite: intersect;
+  z-index: 1;
 }
-.hero__content,
 .entry-card,
 .hero__scroll {
   position: relative;
   z-index: 2;
 }
-.hero__character,
-.hero__gift {
+.sr-only {
   position: absolute;
-  z-index: 1;
-  pointer-events: none;
-}
-.hero__character--main {
-  top: 60px;
-  right: 8vw;
-  width: min(30vw, 420px);
-  height: auto;
-}
-.hero__character--side {
-  bottom: -20px;
-  left: 2vw;
-  width: min(20vw, 260px);
-  height: auto;
-}
-.hero__gift {
-  top: 45%;
-  right: 4vw;
-  width: min(14vw, 220px);
-  height: auto;
-}
-
-.hero__content {
-  max-width: 640px;
-  margin: 20px auto 0;
-  text-align: left;
-}
-.hero__badge {
-  display: inline-block;
-  font-size: 0.75rem;
-  letter-spacing: 0.3em;
-  color: var(--accent-blue-light);
-  margin-bottom: 16px;
-}
-.hero__headline {
-  margin: 0 0 20px;
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(2rem, 5vw, 3.4rem);
-  line-height: 1.25;
-}
-.hero__headline span {
-  display: block;
-}
-.hero__headline-white {
-  color: var(--text-white);
-}
-.hero__headline-blue {
-  color: var(--accent-blue-light);
-  text-shadow:
-    0 0 12px rgba(47, 155, 255, 0.8),
-    0 0 32px rgba(47, 155, 255, 0.5);
-}
-.hero__subcopy {
-  font-family: var(--font-hand);
-  font-size: 1.3rem;
-  color: var(--text-white);
-  border-bottom: 2px solid var(--accent-blue-light);
-  display: inline-block;
-  padding-bottom: 6px;
-}
-
-.hero__sign {
-  position: absolute;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 16px 20px;
-  font-family: var(--font-display);
-  font-size: clamp(1rem, 1.8vw, 1.6rem);
-  line-height: 1.1;
-  letter-spacing: 0.03em;
-  color: var(--accent-blue-light);
-  text-shadow: 0 0 10px rgba(47, 155, 255, 0.7);
-  background: rgba(5, 8, 20, 0.7);
-  border: 2px solid var(--card-border);
-  border-radius: 6px;
-  box-shadow:
-    0 0 24px rgba(47, 155, 255, 0.35),
-    inset 0 0 18px rgba(47, 155, 255, 0.2);
-}
-.hero__sign--left {
-  top: 34%;
-  left: 3vw;
-  transform: perspective(600px) rotateY(18deg) rotate(4deg);
-}
-.hero__sign--right {
-  top: 22%;
-  right: 3vw;
-  transform: perspective(600px) rotateY(-18deg) rotate(-6deg);
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ===== Entry card ===== */
 .entry-card {
   max-width: 520px;
-  margin: 40px auto 0;
+  margin: 0 auto;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 18px;
@@ -527,17 +451,6 @@ a {
   width: min(18vw, 220px);
   height: auto;
 }
-.about-decor__sign {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--accent-blue-light);
-  text-shadow: 0 0 10px rgba(47, 155, 255, 0.7);
-  padding-bottom: 40px;
-}
 @media (max-width: 768px) {
   .about-decor {
     display: none;
@@ -684,27 +597,8 @@ a {
     gap: 16px;
     border-bottom: 1px solid var(--card-border);
   }
-  .hero__character--main {
-    width: 40vw;
-    top: 20px;
-    right: 2vw;
-  }
-  .hero__sign {
-    font-size: 0.7rem;
-  }
   .about {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .hero__character,
-  .hero__gift,
-  .hero__sign {
-    display: none;
-  }
-  .entry-card {
-    margin-top: 16px;
   }
 }
 
@@ -716,7 +610,7 @@ a {
     padding: 60px 16px;
   }
   .hero {
-    padding: 24px 16px 40px;
+    padding-bottom: 40px;
   }
   .entry-card {
     padding: 20px;
@@ -728,15 +622,11 @@ a {
 
 /* ===== Reduced motion ===== */
 @media (prefers-reduced-motion: reduce) {
-  .hero__headline-blue,
   .entry-form__submit,
   .header__cta,
   .header__logo,
   .countdown__value {
     text-shadow: none;
     box-shadow: none;
-  }
-  .hero::before {
-    opacity: 0.3;
   }
 }
