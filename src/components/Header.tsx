@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const NAV_LINKS = [
   { href: '#hero', label: 'EVENT' },
@@ -7,8 +7,36 @@ const NAV_LINKS = [
   { href: '#faq', label: 'FAQ' },
 ]
 
+/** 화면 위쪽 1/3 지점을 지난 마지막 섹션을 현재 섹션으로 본다. 페이지 맨 아래면 마지막 섹션 */
+function useActiveSection(): string {
+  const [active, setActive] = useState(NAV_LINKS[0].href)
+
+  useEffect(() => {
+    const update = () => {
+      const line = window.innerHeight / 3
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2
+      let current = NAV_LINKS[0].href
+      for (const { href } of NAV_LINKS) {
+        const el = document.querySelector(href)
+        if (el && el.getBoundingClientRect().top <= line) current = href
+      }
+      setActive(atBottom ? NAV_LINKS[NAV_LINKS.length - 1].href : current)
+    }
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+    return () => {
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
+  }, [])
+
+  return active
+}
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const activeHref = useActiveSection()
 
   return (
     <header className="header">
@@ -23,7 +51,8 @@ export default function Header() {
             <a
               key={link.href}
               href={link.href}
-              className={`header__nav-link ${link.href === '#hero' ? 'header__nav-link--active' : ''}`}
+              className={`header__nav-link ${link.href === activeHref ? 'header__nav-link--active' : ''}`}
+              aria-current={link.href === activeHref ? 'location' : undefined}
               onClick={() => setMenuOpen(false)}
             >
               {link.label}
