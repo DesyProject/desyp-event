@@ -102,6 +102,26 @@ export default function Prize() {
           })}
         </div>
 
+          <button
+            type="button"
+            className="prize-carousel__chevron prize-carousel__chevron--prev"
+            onClick={() => go(-1)}
+            aria-label="이전 상품"
+          >
+            <svg viewBox="0 0 24 48" aria-hidden="true">
+              <path d="M20 4 4 24l16 20" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            className="prize-carousel__chevron prize-carousel__chevron--next"
+            onClick={() => go(1)}
+            aria-label="다음 상품"
+          >
+            <svg viewBox="0 0 24 48" aria-hidden="true">
+              <path d="M4 4l16 20L4 44" />
+            </svg>
+          </button>
         <div className="prize-carousel__controls">
           <div className="prize-carousel__dots">
             {PRIZES.map((name, i) => (
