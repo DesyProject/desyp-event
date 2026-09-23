@@ -106,9 +106,12 @@ a {
   color: var(--text-white);
   border-bottom: 2px solid var(--accent-blue-light);
 }
-/* 입체 버튼: 채운 파란색 + 아래쪽 두께 그림자. 누르면 살짝 눌린다 */
+/* 입체 버튼: 앞면(::after)과 옆면(::before)을 따로 그린다.
+   옆면도 같은 파랑-보라를 어둡게 써서 검은 띠가 아니라 버튼 두께처럼 보인다 */
 .header__cta {
-  border: 1px solid rgba(150, 160, 255, 0.3);
+  --depth: 5px;
+  position: relative;
+  isolation: isolate;
   border-radius: 999px;
   padding: 10px 20px;
   font-size: 0.8rem;
@@ -116,29 +119,49 @@ a {
   letter-spacing: 0.1em;
   white-space: nowrap;
   color: var(--text-white);
-  /* 로고 테두리처럼 파랑에서 보라로 이어지는 우주 느낌 */
-  background: linear-gradient(135deg, #2458b0, #4a33a8);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 4px 0 #1a1450,
-    0 6px 16px rgba(74, 51, 168, 0.35);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 calc(var(--depth) + 4px) 16px rgba(74, 51, 168, 0.35);
   transition:
     transform 0.12s,
     box-shadow 0.12s;
 }
+.header__cta::before,
+.header__cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transition: transform 0.12s;
+}
+/* 옆면: 아래로 밀려 있고, 위에서 아래로 갈수록 어두워진다 */
+.header__cta::before {
+  z-index: -2;
+  transform: translateY(var(--depth));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.35)),
+    linear-gradient(135deg, #1d428c, #36258a);
+}
+/* 앞면: 로고 테두리처럼 파랑에서 보라로 */
+.header__cta::after {
+  z-index: -1;
+  background: linear-gradient(135deg, #2458b0, #4a33a8);
+  border: 1px solid rgba(150, 160, 255, 0.3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
 .header__cta:hover {
   transform: translateY(-1px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 5px 0 #1a1450,
-    0 8px 20px rgba(74, 51, 168, 0.45);
+  box-shadow: 0 calc(var(--depth) + 6px) 20px rgba(74, 51, 168, 0.45);
 }
+.header__cta:hover::before {
+  transform: translateY(calc(var(--depth) + 1px));
+}
+/* 누르면 앞면이 옆면 쪽으로 내려앉는다 */
 .header__cta:active {
   transform: translateY(3px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 1px 0 #1a1450,
-    0 2px 6px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 3px 8px rgba(74, 51, 168, 0.3);
+}
+.header__cta:active::before {
+  transform: translateY(calc(var(--depth) - 3px));
 }
 .header__hamburger {
   display: none;
