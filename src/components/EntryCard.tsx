@@ -121,7 +121,7 @@ export default function EntryCard() {
         ) : me?.registered ? (
           <div className="entry-card__status">
             <p className="entry-card__status-title">사전등록 완료!</p>
-            <p className="entry-card__status-body">당첨 안내는 {me.emailMasked}로 보내드려요.</p>
+            <p className="entry-card__status-body">당첨 안내는 이벤트에 참여한 이메일로 보내드립니다.</p>
           </div>
         ) : me ? (
           <form onSubmit={handleSubmit} noValidate>
