@@ -17,7 +17,7 @@ const VISIBLE_RANGE = 2 // 가운데 기준 좌우로 보이는 카드 수
 const SWIPE_PX = 40
 
 /** 가운데(current)에서 i번 카드까지의 거리. 양끝이 이어지도록 가장 가까운 방향을 고른다 */
-export function circularOffset(i: number, current: number, n: number): number {
+function circularOffset(i: number, current: number, n: number): number {
   let d = (((i - current) % n) + n) % n
   if (d > n / 2) d -= n
   return d
@@ -37,9 +37,9 @@ export default function Prize() {
   // current가 바뀔 때마다 타이머를 새로 걸어서, 직접 넘긴 직후 바로 또 넘어가지 않는다
   useEffect(() => {
     if (paused || prefersReducedMotion()) return
-    const id = window.setTimeout(() => go(1), AUTOPLAY_MS)
+    const id = window.setTimeout(() => setCurrent((c) => (c + 1) % n), AUTOPLAY_MS)
     return () => window.clearTimeout(id)
-  }, [current, paused])
+  }, [current, paused, n])
 
   return (
     <section id="prize" className="section prize">
@@ -103,9 +103,6 @@ export default function Prize() {
         </div>
 
         <div className="prize-carousel__controls">
-          <button type="button" className="prize-carousel__arrow" onClick={() => go(-1)} aria-label="이전 상품">
-            ←
-          </button>
           <div className="prize-carousel__dots">
             {PRIZES.map((name, i) => (
               <button
@@ -118,9 +115,6 @@ export default function Prize() {
               />
             ))}
           </div>
-          <button type="button" className="prize-carousel__arrow" onClick={() => go(1)} aria-label="다음 상품">
-            →
-          </button>
         </div>
       </div>
 
