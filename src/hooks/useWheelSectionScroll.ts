@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 const LOCK_MS = 900 // 한 번 넘긴 뒤 다음 휠 입력을 받기까지
-const MERGE_PX = 200 // 이보다 가까운 멈춤 지점은 하나로 합친다 (짧게 걸리는 느낌 방지)
+const MERGE_PX = 200 // 화면보다 이만큼 이상 긴 섹션만 두 번 멈춘다. 가까운 멈춤 지점도 이 거리로 합친다
 const INERTIA_GAP_MS = 150 // 트랙패드 관성 입력이 이만큼 끊겨야 다음 넘김을 받는다
 
 /**
@@ -24,9 +24,14 @@ export function useWheelSectionScroll(selector: string, freeFromSelector?: strin
       const points: number[] = []
       document.querySelectorAll<HTMLElement>(selector).forEach((el) => {
         const top = el.getBoundingClientRect().top + window.scrollY - headerH
-        points.push(top)
         const extra = el.offsetHeight - view
-        if (extra > 40) points.push(top + extra)
+        if (extra > MERGE_PX) {
+          // 많이 길면 시작과 끝 두 번 멈춘다
+          points.push(top, top + extra)
+        } else {
+          // 조금만 길면 끝이 다 보이는 지점 한 곳에서 멈춘다 (위쪽 여백만 살짝 가려진다)
+          points.push(top + Math.max(extra, 0))
+        }
       })
       const sorted = points.map((p) => Math.round(Math.min(Math.max(p, 0), max))).sort((a, b) => a - b)
       // 가까운 지점은 합치되, 맨 끝(페이지 바닥)은 항상 남긴다
