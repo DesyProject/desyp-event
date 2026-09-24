@@ -415,6 +415,39 @@ a {
   color: var(--text-dim);
   font-weight: 500;
 }
+.entry-card__referral {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  background: rgba(5, 8, 20, 0.6);
+}
+.entry-card__referral code {
+  overflow-wrap: anywhere;
+  color: var(--text-white);
+  user-select: all;
+}
+.entry-card__referral-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.entry-card__referral button.entry-card__share {
+  border-color: transparent;
+  background: linear-gradient(135deg, #2458b0, #4a33a8);
+  font-weight: 700;
+}
+.entry-card__referral button {
+  padding: 8px 14px;
+  border: 1px solid var(--accent-blue-light);
+  border-radius: 999px;
+  color: var(--text-white);
+  background: transparent;
+  cursor: pointer;
+}
 .entry-form__label {
   display: block;
   font-weight: 700;
@@ -442,20 +475,21 @@ a {
   color: var(--text-white);
   font-size: 1rem;
 }
+/* 추천 코드는 대문자라 보이는 것도 대문자로 맞춘다 (입력값 자체는 보낼 때 변환) */
+.entry-form__text {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.entry-form__text::placeholder {
+  text-transform: none;
+  letter-spacing: normal;
+}
 .entry-form__text::placeholder {
   color: var(--text-dim);
-}
-.entry-form__text[aria-invalid="true"] {
-  border-color: #ff8080;
 }
 .entry-form__text:focus {
   outline: none;
   border-color: var(--accent-blue-light);
-}
-.entry-form__hint {
-  color: #ff8080;
-  font-size: 0.8rem;
-  margin: -10px 0 16px;
 }
 .entry-form__checkbox-row {
   display: flex;

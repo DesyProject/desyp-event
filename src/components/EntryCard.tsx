@@ -1,16 +1,15 @@
 import { useEffect, useId, useState } from 'react'
 import {
   fetchMe,
+  fetchReferralScore,
   LOGIN_ERROR_MESSAGES,
   startNaverLogin,
   submitPreRegistration,
   type Me,
+  type ReferralScore,
 } from '../api/preRegistration'
 import { pad2, useCountdown } from '../hooks/useCountdown'
 import ResultModal from './ResultModal'
-
-// 형식만 가볍게 확인한다. 실제로 등록된 사람인지는 백엔드가 확인한다
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 /** 백엔드가 로그인 뒤 돌려보낸 ?login=error&reason=... 를 읽고 주소에서 지운다 */
 function consumeLoginError(): string | null {
@@ -22,6 +21,33 @@ function consumeLoginError(): string | null {
   const query = params.toString()
   window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`)
   return LOGIN_ERROR_MESSAGES[reason] ?? LOGIN_ERROR_MESSAGES.default
+}
+
+const REF_PARAM = 'ref'
+const REF_STORAGE_KEY = 'desyp_ref'
+/** 백엔드가 발급하는 추천 코드 길이 (혼동 문자를 뺀 대문자·숫자) */
+const REFERRAL_CODE_LENGTH = 8
+
+function normalizeReferralCode(value: string): string {
+  return value.replace(/\s/g, '').toUpperCase().slice(0, REFERRAL_CODE_LENGTH)
+}
+
+/**
+ * 공유 링크(?ref=코드)로 들어오면 코드를 기억해 둔다.
+ * 네이버 로그인을 다녀오면 주소의 ?ref가 사라지므로 sessionStorage에도 남긴다.
+ */
+function readSharedReferralCode(): string {
+  const fromUrl = normalizeReferralCode(new URLSearchParams(window.location.search).get(REF_PARAM) ?? '')
+  try {
+    if (fromUrl) sessionStorage.setItem(REF_STORAGE_KEY, fromUrl)
+    return fromUrl || sessionStorage.getItem(REF_STORAGE_KEY) || ''
+  } catch {
+    return fromUrl // 저장소가 막힌 브라우저
+  }
+}
+
+function shareUrl(code: string): string {
+  return `${window.location.origin}/?${REF_PARAM}=${encodeURIComponent(code)}`
 }
 
 /** "자세히"를 누르면 개인정보 안내를 펼친 뒤 그 위치로 이동한다 */
@@ -42,7 +68,9 @@ export default function EntryCard() {
   const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [agreePrivacy, setAgreePrivacy] = useState(false)
   const [agreeMarketing, setAgreeMarketing] = useState(false)
-  const [referrer, setReferrer] = useState('')
+  const [referrer, setReferrer] = useState(readSharedReferralCode)
+  const [referralScore, setReferralScore] = useState<ReferralScore | null>(null)
+  const [copied, setCopied] = useState<'code' | 'link' | null>(null)
   const [busy, setBusy] = useState(false)
   const [modalMessage, setModalMessage] = useState<string | null>(() => consumeLoginError())
 
@@ -52,18 +80,49 @@ export default function EntryCard() {
       .catch(() => setMe(null))
   }, [])
 
+  useEffect(() => {
+    if (!me?.registered) return
+    fetchReferralScore()
+      .then(setReferralScore)
+      .catch(() => setReferralScore(null))
+  }, [me?.registered])
+
   const closed = countdown.isEnded
-  const referrerEmail = referrer.trim().toLowerCase()
-  const referrerInvalid = referrerEmail !== '' && !EMAIL_PATTERN.test(referrerEmail)
+  const enteredReferralCode = referrer.trim()
   const canSubmit =
     !!me &&
     !me.registered &&
     ageConfirmed &&
     agreePrivacy &&
     agreeMarketing &&
-    !referrerInvalid &&
     !busy &&
     !closed
+
+  async function copyText(text: string, what: 'code' | 'link') {
+    const label = what === 'code' ? '추천 코드' : '링크'
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(what)
+      window.setTimeout(() => setCopied(null), 2000)
+    } catch {
+      // 복사가 막힌 브라우저: 직접 복사하도록 안내한다
+      setModalMessage(`복사하지 못했어요. 아래 ${label}를 길게 눌러 직접 복사해주세요.\n${text}`)
+    }
+  }
+
+  /** 폰은 공유 시트(카톡·인스타 등)를 열고, 지원하지 않는 브라우저는 링크를 복사한다 */
+  async function shareReferral(code: string) {
+    const url = shareUrl(code)
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'De_sy_P 사전등록', text: '같이 사전등록하고 선물 받자! 내 추천 코드가 자동으로 입력돼요.', url })
+        return
+      } catch (e) {
+        if ((e as Error).name === 'AbortError') return // 사용자가 공유 창을 닫음
+      }
+    }
+    await copyText(url, 'link')
+  }
 
   async function handleLogin() {
     setBusy(true)
@@ -80,10 +139,15 @@ export default function EntryCard() {
       ageConfirmed,
       agreePrivacy,
       agreeMarketing,
-      referrerEmail: referrerEmail || undefined,
+      referralCode: enteredReferralCode || undefined,
     })
     setBusy(false)
     if (result.kind === 'success' || result.kind === 'already') {
+      try {
+        sessionStorage.removeItem(REF_STORAGE_KEY)
+      } catch {
+        // 저장소가 막혀 있으면 지울 것도 없다
+      }
       setMe((prev) => prev && { ...prev, registered: true })
     } else if (result.kind === 'unauthorized') {
       setMe(null)
@@ -135,6 +199,25 @@ export default function EntryCard() {
           <div className="entry-card__status">
             <p className="entry-card__status-title">사전등록 완료!</p>
             <p className="entry-card__status-body">당첨 안내는 이벤트에 참여한 이메일로 보내드립니다.</p>
+            {referralScore && (
+              <div className="entry-card__referral">
+                <span>내 추천 코드</span>
+                <code>{referralScore.referralCode}</code>
+                <span>현재 추천 점수 {referralScore.totalScore}점</span>
+                <div className="entry-card__referral-actions">
+                  <button
+                    type="button"
+                    className="entry-card__share"
+                    onClick={() => shareReferral(referralScore.referralCode)}
+                  >
+                    {copied === 'link' ? '링크 복사됨!' : '친구에게 공유하기'}
+                  </button>
+                  <button type="button" onClick={() => copyText(referralScore.referralCode, 'code')}>
+                    {copied === 'code' ? '복사됨!' : '코드 복사'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ) : me ? (
           <form onSubmit={handleSubmit} noValidate>
@@ -144,27 +227,21 @@ export default function EntryCard() {
             </p>
 
             <label htmlFor={referralId} className="entry-form__label">
-              추천인 이메일 <span className="entry-form__optional">(선택)</span>
+              추천 코드 <span className="entry-form__optional">(선택)</span>
               <span className="entry-form__perk">입력하면 나도 추천 점수를 받아요!</span>
             </label>
             <input
               id={referralId}
-              type="email"
-              inputMode="email"
+              type="text"
               className="entry-form__text"
               value={referrer}
-              onChange={(e) => setReferrer(e.target.value)}
-              placeholder="나를 추천한 친구의 네이버 이메일"
+              onChange={(e) => setReferrer(normalizeReferralCode(e.target.value))}
+              placeholder="친구가 공유한 추천 코드 8자리 (예: 7K2QM9XA)"
               autoComplete="off"
-              maxLength={100}
-              aria-invalid={referrerInvalid}
-              aria-describedby={referrerInvalid ? `${referralId}-hint` : undefined}
+              autoCapitalize="characters"
+              spellCheck={false}
+              /* maxLength는 두지 않는다. 붙여넣을 때 공백을 지우기 전에 글자를 잘라버리기 때문. 길이는 normalizeReferralCode가 자른다 */
             />
-            {referrerInvalid && (
-              <p id={`${referralId}-hint`} className="entry-form__hint">
-                이메일 형식으로 입력해주세요. 예) friend@naver.com
-              </p>
-            )}
 
             <div className="entry-form__checkbox-row">
               <input

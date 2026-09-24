@@ -13,13 +13,22 @@ export interface PreRegistrationRequest {
   ageConfirmed: boolean
   agreePrivacy: boolean
   agreeMarketing: boolean
-  /** 나를 추천한 사람이 사전등록에 쓴 이메일. 선택 */
-  referrerEmail?: string
+  /** 나를 추천한 사람이 공유한 추천 코드. 선택 */
+  referralCode?: string
+}
+
+export interface ReferralScore {
+  subscriberId: number
+  referralCode: string
+  referralCount: number
+  referralBonus: number
+  totalScore: number
 }
 
 export interface SubmitResult {
   kind: SubmitKind
   message: string
+  referralCode?: string
 }
 
 export type SubmitKind =
@@ -34,7 +43,7 @@ export type SubmitKind =
 const MESSAGES: Record<SubmitKind, string> = {
   success: '사전등록이 완료되었습니다. 오픈 소식을 가장 먼저 알려드릴게요!',
   already: '이미 사전등록했습니다. 한 사람당 한 번만 참여할 수 있어요.',
-  invalid_referral: '이 이메일로 사전등록한 사람을 찾을 수 없습니다. 추천인 이메일을 다시 확인해주세요.',
+  invalid_referral: '유효하지 않은 추천 코드입니다. 추천 코드를 다시 확인해주세요.',
   closed: '사전등록이 마감되었습니다.',
   unauthorized: '로그인이 만료되었습니다. 네이버 로그인을 다시 해주세요.',
   rate_limited: '잠시 후 다시 시도해주세요.',
@@ -61,7 +70,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 export const isMock = !API_BASE_URL
 
 // ===== 목업 (페이지를 새로고침하면 초기화된다) =====
-const mock = { loggedIn: false, registered: false }
+const mock = { loggedIn: false, registered: false, referralCode: '7K2QM9XA' }
 
 // ===== 공개 함수 =====
 
@@ -88,13 +97,24 @@ export async function fetchMe(): Promise<Me | null> {
   return res.json()
 }
 
+/** 로그인한 사전등록자의 추천 코드와 현재 점수 */
+export async function fetchReferralScore(): Promise<ReferralScore> {
+  if (isMock) {
+    return { subscriberId: 1, referralCode: mock.referralCode, referralCount: 0, referralBonus: 0, totalScore: 0 }
+  }
+  const res = await fetch(`${API_BASE_URL}/api/referrals/me`, { credentials: 'include' })
+  if (!res.ok) throw new Error(`GET /api/referrals/me ${res.status}`)
+  const body = await res.json() as { data: ReferralScore }
+  return body.data
+}
+
 export async function submitPreRegistration(req: PreRegistrationRequest): Promise<SubmitResult> {
   if (isMock) {
     await new Promise((r) => setTimeout(r, 600))
-    // 목업 테스트용: 추천인 이메일에 wrong@naver.com을 넣으면 찾을 수 없음 응답
-    if (req.referrerEmail === 'wrong@naver.com') return { kind: 'invalid_referral', message: MESSAGES.invalid_referral }
+    // 목업 테스트용: ZZZZZZZZ를 넣으면 찾을 수 없음 응답
+    if (req.referralCode === 'ZZZZZZZZ') return { kind: 'invalid_referral', message: MESSAGES.invalid_referral }
     mock.registered = true
-    return { kind: 'success', message: MESSAGES.success }
+    return { kind: 'success', message: MESSAGES.success, referralCode: mock.referralCode }
   }
 
   try {
@@ -104,14 +124,14 @@ export async function submitPreRegistration(req: PreRegistrationRequest): Promis
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req),
     })
-    let body: { message?: string | null } = {}
+    let body: { message?: string | null; data?: { referralCode?: string } } = {}
     try {
       body = await res.json()
     } catch {
       // 본문이 없어도 status 코드로 판단한다
     }
     const kind: SubmitKind = res.ok ? 'success' : (STATUS_KIND[res.status] ?? 'error')
-    return { kind, message: body.message ?? MESSAGES[kind] }
+    return { kind, message: body.message ?? MESSAGES[kind], referralCode: body.data?.referralCode }
   } catch {
     return { kind: 'error', message: MESSAGES.error }
   }
