@@ -156,7 +156,7 @@ export default function EntryCard() {
               <div className="entry-card__referral">
                 <span>내 추천 코드</span>
                 <code>{referralScore.referralCode}</code>
-                <span>추천 {referralScore.referralCount}명 · 현재 {referralScore.totalScore}점</span>
+                <span>현재 추천 점수 {referralScore.totalScore}점</span>
                 <button type="button" onClick={() => copyReferralCode(referralScore.referralCode)}>
                   {copied ? '복사됨!' : '코드 복사'}
                 </button>
