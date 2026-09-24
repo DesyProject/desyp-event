@@ -43,6 +43,7 @@ export default function EntryCard() {
   const [agreeMarketing, setAgreeMarketing] = useState(false)
   const [referrer, setReferrer] = useState('')
   const [referralScore, setReferralScore] = useState<ReferralScore | null>(null)
+  const [copied, setCopied] = useState(false)
   const [busy, setBusy] = useState(false)
   const [modalMessage, setModalMessage] = useState<string | null>(() => consumeLoginError())
 
@@ -69,6 +70,17 @@ export default function EntryCard() {
     agreeMarketing &&
     !busy &&
     !closed
+
+  async function copyReferralCode(code: string) {
+    try {
+      await navigator.clipboard.writeText(code)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // 복사가 막힌 브라우저: 코드는 한 번 누르면 전체 선택되므로 직접 복사하도록 안내한다
+      setModalMessage(`복사하지 못했어요. 추천 코드를 길게 눌러 직접 복사해주세요.\n${code}`)
+    }
+  }
 
   async function handleLogin() {
     setBusy(true)
@@ -145,7 +157,9 @@ export default function EntryCard() {
                 <span>내 추천 코드</span>
                 <code>{referralScore.referralCode}</code>
                 <span>추천 {referralScore.referralCount}명 · 현재 {referralScore.totalScore}점</span>
-                <button type="button" onClick={() => navigator.clipboard.writeText(referralScore.referralCode)}>코드 복사</button>
+                <button type="button" onClick={() => copyReferralCode(referralScore.referralCode)}>
+                  {copied ? '복사됨!' : '코드 복사'}
+                </button>
               </div>
             )}
           </div>
