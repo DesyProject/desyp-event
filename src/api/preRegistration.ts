@@ -70,7 +70,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 export const isMock = !API_BASE_URL
 
 // ===== 목업 (페이지를 새로고침하면 초기화된다) =====
-const mock = { loggedIn: false, registered: false, referralCode: 'DESYP-DEMO-CODE' }
+const mock = { loggedIn: false, registered: false, referralCode: '7K2QM9XA' }
 
 // ===== 공개 함수 =====
 
@@ -111,8 +111,8 @@ export async function fetchReferralScore(): Promise<ReferralScore> {
 export async function submitPreRegistration(req: PreRegistrationRequest): Promise<SubmitResult> {
   if (isMock) {
     await new Promise((r) => setTimeout(r, 600))
-    // 목업 테스트용: WRONG-CODE를 넣으면 찾을 수 없음 응답
-    if (req.referralCode === 'WRONG-CODE') return { kind: 'invalid_referral', message: MESSAGES.invalid_referral }
+    // 목업 테스트용: ZZZZZZZZ를 넣으면 찾을 수 없음 응답
+    if (req.referralCode === 'ZZZZZZZZ') return { kind: 'invalid_referral', message: MESSAGES.invalid_referral }
     mock.registered = true
     return { kind: 'success', message: MESSAGES.success, referralCode: mock.referralCode }
   }

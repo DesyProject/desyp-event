@@ -475,6 +475,15 @@ a {
   color: var(--text-white);
   font-size: 1rem;
 }
+/* 추천 코드는 대문자라 보이는 것도 대문자로 맞춘다 (입력값 자체는 보낼 때 변환) */
+.entry-form__text {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.entry-form__text::placeholder {
+  text-transform: none;
+  letter-spacing: normal;
+}
 .entry-form__text::placeholder {
   color: var(--text-dim);
 }

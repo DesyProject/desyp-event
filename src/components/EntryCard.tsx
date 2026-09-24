@@ -25,13 +25,19 @@ function consumeLoginError(): string | null {
 
 const REF_PARAM = 'ref'
 const REF_STORAGE_KEY = 'desyp_ref'
+/** 백엔드가 발급하는 추천 코드 길이 (혼동 문자를 뺀 대문자·숫자) */
+const REFERRAL_CODE_LENGTH = 8
+
+function normalizeReferralCode(value: string): string {
+  return value.replace(/\s/g, '').toUpperCase().slice(0, REFERRAL_CODE_LENGTH)
+}
 
 /**
  * 공유 링크(?ref=코드)로 들어오면 코드를 기억해 둔다.
  * 네이버 로그인을 다녀오면 주소의 ?ref가 사라지므로 sessionStorage에도 남긴다.
  */
 function readSharedReferralCode(): string {
-  const fromUrl = new URLSearchParams(window.location.search).get(REF_PARAM)?.trim() ?? ''
+  const fromUrl = normalizeReferralCode(new URLSearchParams(window.location.search).get(REF_PARAM) ?? '')
   try {
     if (fromUrl) sessionStorage.setItem(REF_STORAGE_KEY, fromUrl)
     return fromUrl || sessionStorage.getItem(REF_STORAGE_KEY) || ''
@@ -229,10 +235,12 @@ export default function EntryCard() {
               type="text"
               className="entry-form__text"
               value={referrer}
-              onChange={(e) => setReferrer(e.target.value)}
-              placeholder="친구가 공유한 추천 코드"
+              onChange={(e) => setReferrer(normalizeReferralCode(e.target.value))}
+              placeholder="친구가 공유한 추천 코드 8자리 (예: 7K2QM9XA)"
               autoComplete="off"
-              maxLength={64}
+              autoCapitalize="characters"
+              spellCheck={false}
+              maxLength={REFERRAL_CODE_LENGTH}
             />
 
             <div className="entry-form__checkbox-row">
