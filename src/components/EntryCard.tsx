@@ -240,7 +240,7 @@ export default function EntryCard() {
               autoComplete="off"
               autoCapitalize="characters"
               spellCheck={false}
-              maxLength={REFERRAL_CODE_LENGTH}
+              /* maxLength는 두지 않는다. 붙여넣을 때 공백을 지우기 전에 글자를 잘라버리기 때문. 길이는 normalizeReferralCode가 자른다 */
             />
 
             <div className="entry-form__checkbox-row">
