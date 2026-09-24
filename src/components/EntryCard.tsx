@@ -1,16 +1,15 @@
 import { useEffect, useId, useState } from 'react'
 import {
   fetchMe,
+  fetchReferralScore,
   LOGIN_ERROR_MESSAGES,
   startNaverLogin,
   submitPreRegistration,
   type Me,
+  type ReferralScore,
 } from '../api/preRegistration'
 import { pad2, useCountdown } from '../hooks/useCountdown'
 import ResultModal from './ResultModal'
-
-// 형식만 가볍게 확인한다. 실제로 등록된 사람인지는 백엔드가 확인한다
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 /** 백엔드가 로그인 뒤 돌려보낸 ?login=error&reason=... 를 읽고 주소에서 지운다 */
 function consumeLoginError(): string | null {
@@ -43,6 +42,7 @@ export default function EntryCard() {
   const [agreePrivacy, setAgreePrivacy] = useState(false)
   const [agreeMarketing, setAgreeMarketing] = useState(false)
   const [referrer, setReferrer] = useState('')
+  const [referralScore, setReferralScore] = useState<ReferralScore | null>(null)
   const [busy, setBusy] = useState(false)
   const [modalMessage, setModalMessage] = useState<string | null>(() => consumeLoginError())
 
@@ -52,16 +52,21 @@ export default function EntryCard() {
       .catch(() => setMe(null))
   }, [])
 
+  useEffect(() => {
+    if (!me?.registered) return
+    fetchReferralScore()
+      .then(setReferralScore)
+      .catch(() => setReferralScore(null))
+  }, [me?.registered])
+
   const closed = countdown.isEnded
-  const referrerEmail = referrer.trim().toLowerCase()
-  const referrerInvalid = referrerEmail !== '' && !EMAIL_PATTERN.test(referrerEmail)
+  const enteredReferralCode = referrer.trim()
   const canSubmit =
     !!me &&
     !me.registered &&
     ageConfirmed &&
     agreePrivacy &&
     agreeMarketing &&
-    !referrerInvalid &&
     !busy &&
     !closed
 
@@ -80,7 +85,7 @@ export default function EntryCard() {
       ageConfirmed,
       agreePrivacy,
       agreeMarketing,
-      referrerEmail: referrerEmail || undefined,
+      referralCode: enteredReferralCode || undefined,
     })
     setBusy(false)
     if (result.kind === 'success' || result.kind === 'already') {
@@ -135,6 +140,14 @@ export default function EntryCard() {
           <div className="entry-card__status">
             <p className="entry-card__status-title">사전등록 완료!</p>
             <p className="entry-card__status-body">당첨 안내는 이벤트에 참여한 이메일로 보내드립니다.</p>
+            {referralScore && (
+              <div className="entry-card__referral">
+                <span>내 추천 코드</span>
+                <code>{referralScore.referralCode}</code>
+                <span>추천 {referralScore.referralCount}명 · 현재 {referralScore.totalScore}점</span>
+                <button type="button" onClick={() => navigator.clipboard.writeText(referralScore.referralCode)}>코드 복사</button>
+              </div>
+            )}
           </div>
         ) : me ? (
           <form onSubmit={handleSubmit} noValidate>
@@ -144,27 +157,19 @@ export default function EntryCard() {
             </p>
 
             <label htmlFor={referralId} className="entry-form__label">
-              추천인 이메일 <span className="entry-form__optional">(선택)</span>
+              추천 코드 <span className="entry-form__optional">(선택)</span>
               <span className="entry-form__perk">입력하면 나도 추천 점수를 받아요!</span>
             </label>
             <input
               id={referralId}
-              type="email"
-              inputMode="email"
+              type="text"
               className="entry-form__text"
               value={referrer}
               onChange={(e) => setReferrer(e.target.value)}
-              placeholder="나를 추천한 친구의 네이버 이메일"
+              placeholder="친구가 공유한 추천 코드"
               autoComplete="off"
-              maxLength={100}
-              aria-invalid={referrerInvalid}
-              aria-describedby={referrerInvalid ? `${referralId}-hint` : undefined}
+              maxLength={64}
             />
-            {referrerInvalid && (
-              <p id={`${referralId}-hint`} className="entry-form__hint">
-                이메일 형식으로 입력해주세요. 예) friend@naver.com
-              </p>
-            )}
 
             <div className="entry-form__checkbox-row">
               <input

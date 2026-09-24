@@ -25,16 +25,16 @@ npm run preview          # 빌드 결과 로컬 확인
 ## 사전등록 흐름
 
 1. **로그인 전:** "네이버로 로그인" 버튼만 보인다.
-2. **로그인 후:** 가린 이메일, 추천인 이메일 입력칸(선택), 동의 체크박스 3개(만 14세 이상·개인정보 수집·오픈 알림 수신, 모두 필수), "사전등록하기" 버튼이 보인다.
+2. **로그인 후:** 가린 이메일, 추천 코드 입력칸(선택), 동의 체크박스 3개(만 14세 이상·개인정보 수집·오픈 알림 수신, 모두 필수), "사전등록하기" 버튼이 보인다.
 3. **등록 완료:** "사전등록 완료!"와 당첨 안내 문구가 보인다. 마감 시각이 지나면 모든 단계 대신 마감 안내가 보인다.
 
-`VITE_API_BASE_URL`이 비어 있으면 목업으로 동작한다. 로그인 버튼을 누르면 바로 로그인된 상태가 되고, 새로고침하면 초기화된다. 추천인 이메일에 `wrong@naver.com`을 넣으면 찾을 수 없음 응답을 볼 수 있다.
+`VITE_API_BASE_URL`이 비어 있으면 목업으로 동작한다. 로그인 버튼을 누르면 바로 로그인된 상태가 되고, 새로고침하면 초기화된다. 추천 코드에 `WRONG-CODE`를 넣으면 찾을 수 없음 응답을 볼 수 있다.
 
 **수집 정보와 용도:** 이메일은 당첨·이벤트 안내 연락에 쓴다. 휴대전화번호는 한 사람이 여러 네이버 계정으로 참여하는 것을 막는 데만 쓰고, 연락에는 일절 사용하지 않는다.
 
 ## 백엔드 API
 
-프론트는 아래 세 가지만 호출한다. 모두 `VITE_API_BASE_URL` 기준이며, 세션은 쿠키로 유지한다. 백엔드는 `https://api.desyp.site`이고, 같은 사이트의 하위 도메인이라 쿠키는 `SameSite=Lax; Secure; HttpOnly`로 동작한다. CORS는 `https://www.desyp.site`만 허용하므로, Vercel 미리보기 주소(`*.vercel.app`)에서는 목업으로 확인한다.
+프론트는 아래 네 API를 호출한다. 모두 `VITE_API_BASE_URL` 기준이며, 세션은 쿠키로 유지한다. 백엔드는 `https://api.desyp.site`이고, 같은 사이트의 하위 도메인이라 쿠키는 `SameSite=Lax; Secure; HttpOnly`로 동작한다. CORS는 `https://www.desyp.site`만 허용하므로, Vercel 미리보기 주소(`*.vercel.app`)에서는 목업으로 확인한다.
 
 로컬에서 실제 백엔드에 붙일 때는 `.env`에 `VITE_API_BASE_URL=http://localhost:8080`을 넣는다. 로그인은 네이버 개발자센터 멤버관리에 등록된 테스터 계정만 된다.
 
@@ -42,7 +42,8 @@ npm run preview          # 빌드 결과 로컬 확인
 | ---- | ---- |
 | `GET /auth/naver/login?return_to=<URL>` | 브라우저가 이 주소로 이동한다. 백엔드가 `state`를 만들어 네이버 인증 페이지로 보내고, 콜백에서 토큰 교환과 프로필 조회(`/v1/nid/me`의 `id`, `email`, `mobile`) 후 세션을 만든다. 끝나면 `return_to`로 돌려보낸다 |
 | `GET /api/me` | 로그인 상태면 `200 { "emailMasked": "des***@naver.com", "registered": false }`, 아니면 `401` |
-| `POST /api/pre-registrations` | 본문 `{ "ageConfirmed": true, "agreePrivacy": true, "agreeMarketing": false, "referrerEmail": "friend@naver.com" }`. `referrerEmail`은 없을 수 있고, 프론트가 소문자로 바꿔 보낸다. 네이버 `id`와 휴대전화번호 기준으로 한 사람당 한 번만 등록한다 |
+| `POST /api/pre-registrations` | 본문 `{ "ageConfirmed": true, "agreePrivacy": true, "agreeMarketing": true, "referralCode": "..." }`. 추천 코드는 선택이며 이메일 같은 개인정보를 추천 식별자로 보내지 않는다. 성공 응답은 본인의 `referralCode`를 반환한다 |
+| `GET /api/referrals/me` | 사전등록한 로그인 사용자의 추천 코드, 실제 추천 수, 코드 사용 보너스, 총점을 반환한다 |
 
 **로그인 실패 시** `return_to`에 `?login=error&reason=<이유>`를 붙여 돌려보낸다. 프론트가 아는 이유는 `no_email`·`no_phone`(제공 거부)과 `cancelled`(사용자 취소)이다. `failed`(그 외 실패)와 모르는 이유는 일반 실패 안내를 띄운다.
 
@@ -53,7 +54,7 @@ npm run preview          # 빌드 결과 로컬 확인
 | `2xx` | 등록 완료 |
 | `400` | 동의 누락·형식 오류 |
 | `401` | 세션 만료. 프론트가 로그인 전 단계로 되돌린다 |
-| `404` | 추천인 이메일로 사전등록한 사람이 없음 (자기 자신의 이메일도 여기에 포함) |
+| `404` | 유효하지 않은 추천 코드 |
 | `409` | 이미 등록한 계정, 또는 같은 휴대전화번호로 다른 계정이 이미 등록 |
 | `410` | 마감 이후 요청. 마감 시각은 서버에서도 확인해야 한다 |
 | `415` | JSON이 아닌 요청 |
