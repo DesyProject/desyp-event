@@ -429,8 +429,18 @@ a {
   color: var(--text-white);
   user-select: all;
 }
+.entry-card__referral-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.entry-card__referral button.entry-card__share {
+  border-color: transparent;
+  background: linear-gradient(135deg, #2458b0, #4a33a8);
+  font-weight: 700;
+}
 .entry-card__referral button {
-  justify-self: center;
   padding: 8px 14px;
   border: 1px solid var(--accent-blue-light);
   border-radius: 999px;

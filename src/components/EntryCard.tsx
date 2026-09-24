@@ -23,6 +23,27 @@ function consumeLoginError(): string | null {
   return LOGIN_ERROR_MESSAGES[reason] ?? LOGIN_ERROR_MESSAGES.default
 }
 
+const REF_PARAM = 'ref'
+const REF_STORAGE_KEY = 'desyp_ref'
+
+/**
+ * 공유 링크(?ref=코드)로 들어오면 코드를 기억해 둔다.
+ * 네이버 로그인을 다녀오면 주소의 ?ref가 사라지므로 sessionStorage에도 남긴다.
+ */
+function readSharedReferralCode(): string {
+  const fromUrl = new URLSearchParams(window.location.search).get(REF_PARAM)?.trim() ?? ''
+  try {
+    if (fromUrl) sessionStorage.setItem(REF_STORAGE_KEY, fromUrl)
+    return fromUrl || sessionStorage.getItem(REF_STORAGE_KEY) || ''
+  } catch {
+    return fromUrl // 저장소가 막힌 브라우저
+  }
+}
+
+function shareUrl(code: string): string {
+  return `${window.location.origin}/?${REF_PARAM}=${encodeURIComponent(code)}`
+}
+
 /** "자세히"를 누르면 개인정보 안내를 펼친 뒤 그 위치로 이동한다 */
 function openPrivacy() {
   const el = document.getElementById('privacy') as HTMLDetailsElement | null
@@ -41,9 +62,9 @@ export default function EntryCard() {
   const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [agreePrivacy, setAgreePrivacy] = useState(false)
   const [agreeMarketing, setAgreeMarketing] = useState(false)
-  const [referrer, setReferrer] = useState('')
+  const [referrer, setReferrer] = useState(readSharedReferralCode)
   const [referralScore, setReferralScore] = useState<ReferralScore | null>(null)
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState<'code' | 'link' | null>(null)
   const [busy, setBusy] = useState(false)
   const [modalMessage, setModalMessage] = useState<string | null>(() => consumeLoginError())
 
@@ -71,15 +92,30 @@ export default function EntryCard() {
     !busy &&
     !closed
 
-  async function copyReferralCode(code: string) {
+  async function copyText(text: string, what: 'code' | 'link') {
+    const label = what === 'code' ? '추천 코드' : '링크'
     try {
-      await navigator.clipboard.writeText(code)
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(text)
+      setCopied(what)
+      window.setTimeout(() => setCopied(null), 2000)
     } catch {
-      // 복사가 막힌 브라우저: 코드는 한 번 누르면 전체 선택되므로 직접 복사하도록 안내한다
-      setModalMessage(`복사하지 못했어요. 추천 코드를 길게 눌러 직접 복사해주세요.\n${code}`)
+      // 복사가 막힌 브라우저: 직접 복사하도록 안내한다
+      setModalMessage(`복사하지 못했어요. 아래 ${label}를 길게 눌러 직접 복사해주세요.\n${text}`)
     }
+  }
+
+  /** 폰은 공유 시트(카톡·인스타 등)를 열고, 지원하지 않는 브라우저는 링크를 복사한다 */
+  async function shareReferral(code: string) {
+    const url = shareUrl(code)
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'De_sy_P 사전등록', text: '같이 사전등록하고 선물 받자! 내 추천 코드가 자동으로 입력돼요.', url })
+        return
+      } catch (e) {
+        if ((e as Error).name === 'AbortError') return // 사용자가 공유 창을 닫음
+      }
+    }
+    await copyText(url, 'link')
   }
 
   async function handleLogin() {
@@ -101,6 +137,11 @@ export default function EntryCard() {
     })
     setBusy(false)
     if (result.kind === 'success' || result.kind === 'already') {
+      try {
+        sessionStorage.removeItem(REF_STORAGE_KEY)
+      } catch {
+        // 저장소가 막혀 있으면 지울 것도 없다
+      }
       setMe((prev) => prev && { ...prev, registered: true })
     } else if (result.kind === 'unauthorized') {
       setMe(null)
@@ -157,9 +198,18 @@ export default function EntryCard() {
                 <span>내 추천 코드</span>
                 <code>{referralScore.referralCode}</code>
                 <span>현재 추천 점수 {referralScore.totalScore}점</span>
-                <button type="button" onClick={() => copyReferralCode(referralScore.referralCode)}>
-                  {copied ? '복사됨!' : '코드 복사'}
-                </button>
+                <div className="entry-card__referral-actions">
+                  <button
+                    type="button"
+                    className="entry-card__share"
+                    onClick={() => shareReferral(referralScore.referralCode)}
+                  >
+                    {copied === 'link' ? '링크 복사됨!' : '친구에게 공유하기'}
+                  </button>
+                  <button type="button" onClick={() => copyText(referralScore.referralCode, 'code')}>
+                    {copied === 'code' ? '복사됨!' : '코드 복사'}
+                  </button>
+                </div>
               </div>
             )}
           </div>
