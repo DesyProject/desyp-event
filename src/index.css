@@ -448,6 +448,22 @@ a {
   background: transparent;
   cursor: pointer;
 }
+.entry-card__kakao {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  color: #191919;
+  background: #fee500;
+  font-weight: 700;
+  text-decoration: none;
+}
+.entry-card__kakao-note {
+  margin: 8px 0 0;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
 .entry-form__label {
   display: block;
   font-weight: 700;

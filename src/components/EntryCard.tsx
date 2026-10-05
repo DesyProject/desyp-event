@@ -5,6 +5,7 @@ import {
   LOGIN_ERROR_MESSAGES,
   startNaverLogin,
   submitPreRegistration,
+  trackKakaoChannelClick,
   type Me,
   type ReferralScore,
 } from '../api/preRegistration'
@@ -22,6 +23,9 @@ function consumeLoginError(): string | null {
   window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`)
   return LOGIN_ERROR_MESSAGES[reason] ?? LOGIN_ERROR_MESSAGES.default
 }
+
+/** 빌드 시 vite.config.ts가 값이 있는지 확인한다 */
+const KAKAO_CHANNEL_URL = import.meta.env.VITE_KAKAO_CHANNEL_URL
 
 const REF_PARAM = 'ref'
 const REF_STORAGE_KEY = 'desyp_ref'
@@ -198,7 +202,21 @@ export default function EntryCard() {
         ) : me?.registered ? (
           <div className="entry-card__status">
             <p className="entry-card__status-title">사전등록 완료!</p>
-            <p className="entry-card__status-body">당첨 안내는 이벤트에 참여한 이메일로 보내드립니다.</p>
+            <p className="entry-card__status-body">
+              사전등록이 완료되었습니다. 이벤트 시작 1시간 전에 네이버 이메일로 안내해 드립니다. 카카오톡 채널을
+              추가하면 이벤트 일정과 주요 공지를 함께 받을 수 있습니다.
+            </p>
+            {/* 기록 요청을 기다리지 않는 일반 링크라 기록이 실패해도 채널은 열린다 */}
+            <a
+              className="entry-card__kakao"
+              href={KAKAO_CHANNEL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => void trackKakaoChannelClick()}
+            >
+              카카오톡으로 이벤트 알림 받기
+            </a>
+            <p className="entry-card__kakao-note">채널 추가는 선택이에요. 추가하지 않아도 이메일 안내는 그대로 받아요.</p>
             {referralScore && (
               <div className="entry-card__referral">
                 <span>내 추천 코드</span>
