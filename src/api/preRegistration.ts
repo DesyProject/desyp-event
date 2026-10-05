@@ -60,7 +60,6 @@ const STATUS_KIND: Record<number, SubmitKind> = {
 
 /** 백엔드가 로그인 실패 시 돌려보내는 ?login=error&reason=... 의 reason별 안내 */
 export const LOGIN_ERROR_MESSAGES: Record<string, string> = {
-  no_phone: '휴대전화번호 제공에 동의해야 사전등록할 수 있습니다. 중복 참여 확인에만 쓰고 연락에는 사용하지 않아요.',
   no_email: '이메일 제공에 동의해야 사전등록할 수 있습니다. 당첨 안내를 이메일로 드려요.',
   cancelled: '네이버 로그인이 취소되었습니다.',
   default: '네이버 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.',
@@ -106,6 +105,24 @@ export async function fetchReferralScore(): Promise<ReferralScore> {
   if (!res.ok) throw new Error(`GET /api/referrals/me ${res.status}`)
   const body = await res.json() as { data: ReferralScore }
   return body.data
+}
+
+/**
+ * 사전등록 완료 화면의 카카오톡 채널 버튼 클릭 기록. 실제 채널 추가 여부는 알 수 없다.
+ * 기록 실패가 채널 이동을 막으면 안 되므로 오류를 삼킨다
+ */
+export async function trackKakaoChannelClick(): Promise<void> {
+  if (isMock) return
+  try {
+    await fetch(`${API_BASE_URL}/api/conversions/kakao-channel-click`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source: 'PRE_REGISTRATION_COMPLETE' }),
+    })
+  } catch {
+    // 네트워크 오류도 무시한다
+  }
 }
 
 export async function submitPreRegistration(req: PreRegistrationRequest): Promise<SubmitResult> {

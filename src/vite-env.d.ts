@@ -4,6 +4,7 @@ interface ImportMetaEnv {
   readonly VITE_REGISTRATION_END_AT: string
   readonly VITE_RETENTION_DAYS: string
   readonly VITE_API_BASE_URL?: string
+  readonly VITE_KAKAO_CHANNEL_URL: string
 }
 
 interface ImportMeta {

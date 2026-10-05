@@ -17,6 +17,12 @@ export default defineConfig(({ mode }) => {
     )
   }
 
+  if (!env.VITE_KAKAO_CHANNEL_URL || !env.VITE_KAKAO_CHANNEL_URL.trim()) {
+    throw new Error(
+      '[config] VITE_KAKAO_CHANNEL_URL 환경 변수가 필요합니다 (사전등록 완료 화면의 카카오톡 채널 주소. 예: https://pf.kakao.com/_xxxxxx).',
+    )
+  }
+
   return {
     plugins: [react()],
   }
