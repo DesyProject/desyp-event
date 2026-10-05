@@ -1,7 +1,7 @@
 const PRIZE_ITEMS = [
   { icon: 'clock', title: '선착순 1명', body: '이벤트 오픈 순간 가장 먼저 클릭한 1명', prize: '50,000원 기프티콘' },
   { icon: 'document', title: '랜덤 번호 1명', body: '참여자 중 무작위로 뽑힌 번호 1명', prize: '50,000원 기프티콘' },
-  { icon: 'people', title: '추천왕 1명', body: '추천을 가장 많이 받은 1명', prize: '30,000원 상당 상품' },
+  { icon: 'people', title: '추천왕 1명', body: '추천 점수가 가장 높은 1명', prize: '30,000원 상당 상품' },
 ]
 
 const NOTICES = [
