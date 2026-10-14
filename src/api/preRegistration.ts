@@ -71,6 +71,27 @@ export const isMock = !API_BASE_URL
 // ===== 목업 (페이지를 새로고침하면 초기화된다) =====
 const mock = { loggedIn: false, registered: false, referralCode: '7K2QM9XA' }
 
+/** 메인 이벤트 목업이 같은 로그인 상태를 쓴다 */
+export function isMockLoggedIn(): boolean {
+  return mock.loggedIn
+}
+/** 메인 이벤트 목업의 세션 만료(401) 확인용 */
+export function expireMockLogin() {
+  mock.loggedIn = false
+}
+
+/** 백엔드가 로그인 뒤 돌려보낸 ?login=error&reason=... 를 읽고 주소에서 지운다 */
+export function consumeLoginError(): string | null {
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('login') !== 'error') return null
+  const reason = params.get('reason') ?? 'default'
+  params.delete('login')
+  params.delete('reason')
+  const query = params.toString()
+  window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`)
+  return LOGIN_ERROR_MESSAGES[reason] ?? LOGIN_ERROR_MESSAGES.default
+}
+
 // ===== 공개 함수 =====
 
 /** 네이버 로그인 시작. 실제 모드는 백엔드로 이동하고, 목업은 바로 로그인된 상태가 된다 */

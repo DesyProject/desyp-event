@@ -1,28 +1,17 @@
 import { useEffect, useId, useState } from 'react'
 import {
+  consumeLoginError,
   fetchMe,
   fetchReferralScore,
-  LOGIN_ERROR_MESSAGES,
   startNaverLogin,
   submitPreRegistration,
   trackKakaoChannelClick,
   type Me,
   type ReferralScore,
 } from '../api/preRegistration'
-import { pad2, useCountdown } from '../hooks/useCountdown'
+import { useCountdown } from '../hooks/useCountdown'
+import Countdown from './Countdown'
 import ResultModal from './ResultModal'
-
-/** 백엔드가 로그인 뒤 돌려보낸 ?login=error&reason=... 를 읽고 주소에서 지운다 */
-function consumeLoginError(): string | null {
-  const params = new URLSearchParams(window.location.search)
-  if (params.get('login') !== 'error') return null
-  const reason = params.get('reason') ?? 'default'
-  params.delete('login')
-  params.delete('reason')
-  const query = params.toString()
-  window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`)
-  return LOGIN_ERROR_MESSAGES[reason] ?? LOGIN_ERROR_MESSAGES.default
-}
 
 /** 빌드 시 vite.config.ts가 값이 있는지 확인한다 */
 const KAKAO_CHANNEL_URL = import.meta.env.VITE_KAKAO_CHANNEL_URL
@@ -168,32 +157,7 @@ export default function EntryCard() {
 
       <p className="entry-card__label">PRE-REGISTRATION ENDS IN</p>
 
-      <div className="countdown">
-        {/* 마지막 날(0일)에는 일 칸을 숨긴다 */}
-        {countdown.days > 0 && (
-          <div className="countdown__unit countdown__unit--days">
-            <span className="countdown__value">
-              {countdown.days}
-              <span className="countdown__suffix">일</span>
-            </span>
-            <span className="countdown__caption">DAYS</span>
-          </div>
-        )}
-        <div className="countdown__unit">
-          <span className="countdown__value">{pad2(countdown.hours)}</span>
-          <span className="countdown__caption">HOURS</span>
-        </div>
-        <span className="countdown__colon">:</span>
-        <div className="countdown__unit">
-          <span className="countdown__value">{pad2(countdown.minutes)}</span>
-          <span className="countdown__caption">MINUTES</span>
-        </div>
-        <span className="countdown__colon">:</span>
-        <div className="countdown__unit">
-          <span className="countdown__value">{pad2(countdown.seconds)}</span>
-          <span className="countdown__caption">SECONDS</span>
-        </div>
-      </div>
+      <Countdown countdown={countdown} />
 
       <div className="entry-form">
         {!closed && !me?.registered && <h2 className="entry-form__title">이벤트 사전등록</h2>}
