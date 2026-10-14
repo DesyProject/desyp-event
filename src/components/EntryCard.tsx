@@ -1,8 +1,8 @@
 import { useEffect, useId, useState } from 'react'
 import {
+  consumeLoginError,
   fetchMe,
   fetchReferralScore,
-  LOGIN_ERROR_MESSAGES,
   startNaverLogin,
   submitPreRegistration,
   trackKakaoChannelClick,
@@ -12,18 +12,6 @@ import {
 import { useCountdown } from '../hooks/useCountdown'
 import Countdown from './Countdown'
 import ResultModal from './ResultModal'
-
-/** 백엔드가 로그인 뒤 돌려보낸 ?login=error&reason=... 를 읽고 주소에서 지운다 */
-function consumeLoginError(): string | null {
-  const params = new URLSearchParams(window.location.search)
-  if (params.get('login') !== 'error') return null
-  const reason = params.get('reason') ?? 'default'
-  params.delete('login')
-  params.delete('reason')
-  const query = params.toString()
-  window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`)
-  return LOGIN_ERROR_MESSAGES[reason] ?? LOGIN_ERROR_MESSAGES.default
-}
 
 /** 빌드 시 vite.config.ts가 값이 있는지 확인한다 */
 const KAKAO_CHANNEL_URL = import.meta.env.VITE_KAKAO_CHANNEL_URL
