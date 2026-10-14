@@ -20,9 +20,9 @@ export function diffToCountdown(diffMs: number): Countdown {
   }
 }
 
-/** endAt: ISO 8601 (KST 오프셋 포함) */
-export function useCountdown(endAt: string): Countdown {
-  const endMs = new Date(endAt).getTime()
+/** endAt: ISO 8601 (KST 오프셋 포함). clockOffsetMs: 서버 시계 - 클라이언트 시계 */
+export function useCountdown(endAt: string, clockOffsetMs = 0): Countdown {
+  const endMs = new Date(endAt).getTime() - clockOffsetMs
   const [countdown, setCountdown] = useState<Countdown>(() =>
     diffToCountdown(endMs - Date.now()),
   )
