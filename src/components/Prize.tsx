@@ -12,7 +12,7 @@ const PRIZES = [
   '쿠팡',
 ]
 
-// 선착순·랜덤 당첨자는 5만원, 추천왕은 3만원. 모든 브랜드가 같다
+// 랜덤 추첨 5만원 1명·3만원 2명·1만원 15명, 추천왕 1위 3만원·2위 1만원. 모든 브랜드가 같다
 const AUTOPLAY_MS = 3000
 const VISIBLE_RANGE = 2 // 가운데 기준 좌우로 보이는 카드 수
 const SWIPE_PX = 40
@@ -96,7 +96,7 @@ export default function Prize() {
                 <span className="gift-card__body">
                   <span className="gift-card__name">{name}</span>
                   <span className="gift-card__amount">
-                    50,000원<span className="gift-card__amount-sub">30,000원</span>
+                    50,000원<span className="gift-card__amount-sub">30,000원 · 10,000원</span>
                   </span>
                 </span>
                 <span className="gift-card__footer">
@@ -145,7 +145,7 @@ export default function Prize() {
       </div>
 
       <p className="prize__tiers">
-        선착순·랜덤 당첨자는 <strong>50,000원</strong>, 추천왕은 <strong>30,000원</strong> 상당 상품을 받아요
+        랜덤 추첨 <strong>50,000원</strong> 1명 · <strong>30,000원</strong> 2명 · <strong>10,000원</strong> 15명, 추천왕 1위 <strong>30,000원</strong> · 2위 <strong>10,000원</strong>
       </p>
       <p className="prize__note">당첨자에게 운영자가 직접 연락해 상품을 안내합니다.</p>
     </section>
