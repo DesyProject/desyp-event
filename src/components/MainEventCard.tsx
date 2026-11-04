@@ -211,8 +211,8 @@ export default function MainEventCard({ event }: { event: EventState }) {
                 </ol>
                 <p className="event-guide__title">당첨 방식</p>
                 <ul>
-                  <li>랜덤 추첨 18명: 50,000원 1명, 30,000원 2명, 10,000원 15명. 같은 아이디는 한 번만 당첨. 종료 직후 발표</li>
-                  <li>추천왕: 사전등록 추천 점수 1위 30,000원, 2위 10,000원</li>
+                  <li>랜덤 추첨 18명: 5만원 1명, 3만원 2명, 1만원 15명. 같은 아이디는 한 번만 당첨. 종료 직후 발표</li>
+                  <li>추천왕: 사전등록 추천 점수 1위 3만원, 2위 1만원</li>
                 </ul>
                 <p className="event-guide__note">네이버 로그인을 한 만 14세 이상이라면 사전등록하지 않았어도 응모할 수 있어요.</p>
               </div>

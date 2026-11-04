@@ -96,7 +96,7 @@ export default function Prize() {
                 <span className="gift-card__body">
                   <span className="gift-card__name">{name}</span>
                   <span className="gift-card__amount">
-                    50,000원<span className="gift-card__amount-sub">30,000원 · 10,000원</span>
+                    5만원<span className="gift-card__amount-sub">3만원 · 1만원</span>
                   </span>
                 </span>
                 <span className="gift-card__footer">
@@ -145,7 +145,7 @@ export default function Prize() {
       </div>
 
       <p className="prize__tiers">
-        랜덤 추첨 <strong>50,000원</strong> 1명 · <strong>30,000원</strong> 2명 · <strong>10,000원</strong> 15명, 추천왕 1위 <strong>30,000원</strong> · 2위 <strong>10,000원</strong>
+        랜덤 추첨 <strong>5만원</strong> 1명 · <strong>3만원</strong> 2명 · <strong>1만원</strong> 15명, 추천왕 1위 <strong>3만원</strong> · 2위 <strong>1만원</strong>
       </p>
       <p className="prize__note">당첨자에게 운영자가 직접 연락해 상품을 안내합니다.</p>
     </section>
