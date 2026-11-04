@@ -26,8 +26,8 @@ type EntryBody = { message?: string | null; receiptNumber?: number }
 export type EntryResult = { ok: true; receiptNumber: number } | { ok: false; status: number; message: string }
 
 /** 이벤트 시간은 고정이다. 서버 응답이 오기 전에도 화면을 그리기 위한 기본값 */
-export const EVENT_START_AT = '2026-10-31T14:00:00+09:00'
-export const EVENT_END_AT = '2026-10-31T14:10:00+09:00'
+export const EVENT_START_AT = '2026-11-28T14:00:00+09:00'
+export const EVENT_END_AT = '2026-11-28T14:10:00+09:00'
 
 /** 응모 중 세션이 만료되면 서버 문구 대신 항상 이 안내를 띄운다 */
 export const SESSION_EXPIRED_MESSAGE = '로그인이 만료됐어요. 다시 로그인한 뒤 이어서 응모해 주세요.'
