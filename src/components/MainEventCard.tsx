@@ -196,7 +196,7 @@ export default function MainEventCard({ event }: { event: EventState }) {
           <Countdown countdown={phase === 'open' ? endCountdown : startCountdown} />
 
           <div className="entry-form">
-            <h2 className="entry-form__title">{phase === 'open' ? '지금 응모하세요!' : '10월 31일 오후 2시 오픈'}</h2>
+            <h2 className="entry-form__title">{phase === 'open' ? '지금 응모하세요!' : '11월 28일 오후 2시 오픈'}</h2>
 
             {phase === 'waiting' && (
               <div className="event-guide">
