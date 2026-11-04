@@ -1,7 +1,7 @@
 const PRIZE_ITEMS = [
-  { icon: 'clock', title: '랜덤 추첨 1명', body: '접수 번호 중 무작위 추첨 (종료 직후 발표)', prize: '50,000원 기프티콘' },
-  { icon: 'document', title: '랜덤 추첨 17명', body: '접수 번호 중 무작위 추첨 (종료 직후 발표)', prize: '30,000원 2명 · 10,000원 15명' },
-  { icon: 'people', title: '추천왕 2명', body: '추천 점수 1위·2위', prize: '1위 30,000원 · 2위 10,000원' },
+  { icon: 'clock', title: '랜덤 추첨 1명', body: '접수 번호 중 무작위 추첨 (종료 직후 발표)', prize: '5만원 기프티콘' },
+  { icon: 'document', title: '랜덤 추첨 17명', body: '접수 번호 중 무작위 추첨 (종료 직후 발표)', prize: '3만원 2명 · 1만원 15명' },
+  { icon: 'people', title: '추천왕 2명', body: '추천 점수 1위·2위', prize: '1위 3만원 · 2위 1만원' },
 ]
 
 const NOTICES = [
