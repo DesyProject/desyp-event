@@ -56,7 +56,7 @@ function useSessionState<T>(key: string, fallback: T) {
 }
 
 export default function MainEventCard({ event }: { event: EventState }) {
-  const { phase, clockOffset, randomNumber, refresh } = event
+  const { phase, clockOffset, randomNumbers, refresh } = event
   const startCountdown = useCountdown(event.startAt, clockOffset)
   const endCountdown = useCountdown(event.endAt, clockOffset)
   const instagramFieldId = useId()
@@ -171,8 +171,12 @@ export default function MainEventCard({ event }: { event: EventState }) {
           <p className="entry-card__status-body">참여해 주셔서 감사합니다!</p>
 
           <div className="event-random">
-            <span>랜덤 당첨 번호</span>
-            {randomNumber !== null ? <strong>#{randomNumber}</strong> : <span>곧 발표합니다. 잠시 후 새로고침해 주세요.</span>}
+            <span>당첨 번호</span>
+            {randomNumbers !== null ? (
+              <strong>{randomNumbers.map((n) => `#${n}`).join(' ')}</strong>
+            ) : (
+              <span>곧 발표합니다. 잠시 후 새로고침해 주세요.</span>
+            )}
           </div>
 
           {myEntries && (
@@ -207,9 +211,8 @@ export default function MainEventCard({ event }: { event: EventState }) {
                 </ol>
                 <p className="event-guide__title">당첨 방식</p>
                 <ul>
-                  <li>선착순: 접수 번호 1번</li>
-                  <li>랜덤 번호: 미리 정해 둔 번호. 응모가 그보다 적으면 마지막 번호. 종료 직후 발표</li>
-                  <li>추천왕: 사전등록 추천 점수 1위</li>
+                  <li>랜덤 추첨 18명: 50,000원 1명, 30,000원 2명, 10,000원 15명. 같은 아이디는 한 번만 당첨. 종료 직후 발표</li>
+                  <li>추천왕: 사전등록 추천 점수 1위 30,000원, 2위 10,000원</li>
                 </ul>
                 <p className="event-guide__note">네이버 로그인을 한 만 14세 이상이라면 사전등록하지 않았어도 응모할 수 있어요.</p>
               </div>

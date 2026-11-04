@@ -9,7 +9,7 @@ export interface EventState {
   endAt: string
   /** 서버 시계 - 클라이언트 시계(ms). 카운트다운과 단계 계산에 더한다 */
   clockOffset: number
-  randomNumber: number | null
+  randomNumbers: number[] | null
   /** 0~3초 뒤 상태를 다시 불러온다 (410을 받았을 때 등) */
   refresh: () => void
 }
@@ -36,7 +36,7 @@ export function useEventPhase(): EventState {
   const [startAt, setStartAt] = useState(EVENT_START_AT)
   const [endAt, setEndAt] = useState(EVENT_END_AT)
   const [clockOffset, setClockOffset] = useState(initialClockOffset)
-  const [randomNumber, setRandomNumber] = useState<number | null>(null)
+  const [randomNumbers, setRandomNumbers] = useState<number[] | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
   // 단계 계산 기준 시각(클라이언트 시계). 단계 경계와 상태 응답 때만 새로 찍는다
   const [now, setNow] = useState(() => Date.now())
@@ -68,7 +68,7 @@ export function useEventPhase(): EventState {
         setNow(receivedAt)
         setStartAt(status.startAt)
         setEndAt(status.endAt)
-        setRandomNumber(status.randomNumber)
+        setRandomNumbers(status.randomNumbers)
       } catch {
         // 상태를 못 불러오면 지금 시계와 고정 시각으로 계속 보여 준다
       }
@@ -79,5 +79,5 @@ export function useEventPhase(): EventState {
     }
   }, [phase, refreshKey])
 
-  return { phase, startAt, endAt, clockOffset, randomNumber, refresh: () => setRefreshKey((k) => k + 1) }
+  return { phase, startAt, endAt, clockOffset, randomNumbers, refresh: () => setRefreshKey((k) => k + 1) }
 }
