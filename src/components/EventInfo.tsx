@@ -1,9 +1,23 @@
 const PRIZE_ITEMS = [
-  { icon: 'clock', title: '당첨 번호 1명', body: '미리 정해 둔 접수 번호', prize: '5만원 기프티콘' },
-  { icon: 'document', title: '당첨 번호 2명', body: '미리 정해 둔 접수 번호', prize: '3만원 기프티콘' },
-  { icon: 'database', title: '당첨 번호 15명', body: '미리 정해 둔 접수 번호', prize: '1만원 기프티콘' },
-  { icon: 'people', title: '추천왕 1위', body: '사전등록 추천 점수 1위', prize: '3만원 상품' },
-  { icon: 'people', title: '추천왕 2위', body: '사전등록 추천 점수 2위', prize: '1만원 상품' },
+  {
+    icon: 'document',
+    title: '당첨 번호 18명',
+    body: '미리 정해 둔 접수 번호',
+    prizes: [
+      { amount: '5만원', count: '1명' },
+      { amount: '3만원', count: '2명' },
+      { amount: '1만원', count: '15명' },
+    ],
+  },
+  {
+    icon: 'people',
+    title: '추천왕 2명',
+    body: '추천 점수 순위',
+    prizes: [
+      { amount: '3만원', count: '1위' },
+      { amount: '1만원', count: '2위' },
+    ],
+  },
 ]
 
 const NOTICES = [
@@ -44,7 +58,14 @@ export default function EventInfo() {
               <h3 className="info-card__title">{item.title}</h3>
               <p className="info-card__body">{item.body}</p>
             </div>
-            <span className="info-card__prize">{item.prize}</span>
+            <ul className="info-card__prizes">
+              {item.prizes.map((p) => (
+                <li key={p.count}>
+                  <span className="info-card__count">{p.count}</span>
+                  <span className="info-card__prize">{p.amount}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         ))}
 
