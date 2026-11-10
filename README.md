@@ -1,6 +1,6 @@
 # desyp-event
 
-[대규모시스템프로젝트] 5만원 기프티콘 랜덤 추첨 이벤트!
+[대규모시스템프로젝트] 5만원 기프티콘 당첨 번호 이벤트!
 
 De_sy_P 사전등록 페이지. Vite + React + TypeScript로 만든 정적 SPA. 네이버 로그인으로만 사전등록을 받고, 로그인 처리와 저장은 별도 백엔드가 맡는다. 백엔드 주소가 없으면 목업 API로 동작한다.
 
@@ -23,7 +23,7 @@ npm run preview          # 빌드 결과 로컬 확인
 | `VITE_KAKAO_CHANNEL_URL` | O | 사전등록 완료 화면의 "카카오톡으로 이벤트 알림 받기" 버튼이 새 창으로 여는 카카오톡 채널 주소. 비어 있으면 `npm run dev`·`npm run build`가 실패한다 |
 | `VITE_API_BASE_URL`   | X    | 비워두면 목업 API 사용. 채우면 사전등록과 메인 이벤트 모두 이 주소로 실제 요청 |
 
-메인 이벤트용 새 환경 변수는 없다. 이벤트 시각(2026-11-28 14:00~14:10 KST)은 `src/api/mainEvent.ts`에 고정값으로 두고, 서버 응답의 `startAt`·`endAt`이 오면 그 값을 쓴다. 보관 기간 안내는 `VITE_RETENTION_DAYS`를 같이 쓴다.
+메인 이벤트용 새 환경 변수는 없다. 이벤트 시각(2026-11-29 14:00~14:10 KST)은 `src/api/mainEvent.ts`에 고정값으로 두고, 서버 응답의 `startAt`·`endAt`이 오면 그 값을 쓴다. 보관 기간 안내는 `VITE_RETENTION_DAYS`를 같이 쓴다.
 
 ## 사전등록 흐름
 
@@ -78,8 +78,8 @@ npm run preview          # 빌드 결과 로컬 확인
 
 | 단계 | 기간 (KST) | 화면 |
 | ---- | ---- | ---- |
-| 사전등록 | ~ 11/27 23:59 (`VITE_REGISTRATION_END_AT`) | 기존 사전등록 카드 그대로 |
-| 대기 | 마감 ~ 11/28 14:00 | 시작 카운트다운, 참여 방법·당첨 방식 안내. 로그인 전에는 "네이버로 로그인" 버튼, 로그인 후에는 가린 이메일·Instagram 아이디·필수 체크박스 2개를 미리 채울 수 있고 응모 버튼은 잠겨 있다 |
+| 사전등록 | ~ 11/28 23:59 (`VITE_REGISTRATION_END_AT`) | 기존 사전등록 카드 그대로 |
+| 대기 | 마감 ~ 11/29 14:00 | 시작 카운트다운, 참여 방법·당첨 방식 안내. 로그인 전에는 "네이버로 로그인" 버튼, 로그인 후에는 가린 이메일·Instagram 아이디·필수 체크박스 2개를 미리 채울 수 있고 응모 버튼은 잠겨 있다 |
 | 응모 중 | 14:00 ~ 14:10 | 대기와 같은 입력 + "응모하기", 종료 카운트다운, 내 응모 횟수와 최근 접수 번호 5개 |
 | 종료 | 14:10 ~ | 마감 안내, 발표된 당첨 번호(없으면 "곧 발표"), 로그인 상태면 서버 기준 내 응모 횟수와 최근 접수 번호, Instagram DM 안내 |
 
@@ -105,7 +105,7 @@ npm run preview          # 빌드 결과 로컬 확인
 
 | 요청 | 응답 |
 | ---- | ---- |
-| `GET /api/event/status` | `200 { "phase": "BEFORE"\|"OPEN"\|"CLOSED", "startAt": ISO, "endAt": ISO, "serverTime": ISO, "randomNumbers": number[]\|null }`. `randomNumbers`는 랜덤 추첨 당첨 접수 번호(추첨 순서, 최대 18개)이며 이벤트 종료 직후 발표 전까지 `null` |
+| `GET /api/event/status` | `200 { "phase": "BEFORE"\|"OPEN"\|"CLOSED", "startAt": ISO, "endAt": ISO, "serverTime": ISO, "winningNumbers": number[]\|null }`. `winningNumbers`는 이벤트 전에 정해 둔 당첨 접수 번호(최대 18개)이며 이벤트 종료 직후 발표 전까지 `null` |
 | `POST /api/event/entries` | 로그인 필요. 본문 `{ "requestId": "uuid", "instagramId": "string", "ageConfirmed": true, "agreeInstagramCollection": true }`. 새 응모면 `201 { "receiptNumber": number }`, 같은 `requestId`를 다시 받으면 처음 발급한 번호로 `200 { "receiptNumber": number }` |
 | `GET /api/event/entries/me` | 로그인 필요. `200 { "count": number, "recent": number[] }`(`recent`는 최신 번호부터 최대 10개), 미로그인이면 `401` |
 
@@ -119,7 +119,7 @@ npm run preview          # 빌드 결과 로컬 확인
 
 오류 본문에 `{ "message": "..." }`가 있으면 그 문구를 그대로 모달에 띄운다.
 
-**당첨:** 이벤트 종료 후 접수 번호 중 18개를 무작위로 뽑아 추첨 순서대로 50,000원 1명, 30,000원 2명, 10,000원 15명에게 준다. 같은 Instagram 아이디는 한 번만 당첨된다. 추천왕은 사전등록 추천 점수 1위(30,000원)와 2위(10,000원)이며 동점이면 무작위 추첨으로 순위를 정한다. 당일 당첨자는 입력한 Instagram 아이디로, 추천왕은 네이버 이메일로 운영자가 연락한다.
+**당첨:** 운영자가 이벤트 전에 정해 둔 접수 번호 18개에 50,000원 1명, 30,000원 2명, 10,000원 15명 상품을 배정하고, 이벤트 종료 직후 번호를 발표한다. 같은 Instagram 아이디는 한 번만 당첨된다. 추천왕은 사전등록 추천 점수 1위(30,000원)와 2위(10,000원)이며 동점이면 무작위 추첨으로 순위를 정한다. 당일 당첨자는 입력한 Instagram 아이디로, 추천왕은 네이버 이메일로 운영자가 연락한다.
 
 ### 목업으로 확인하기
 

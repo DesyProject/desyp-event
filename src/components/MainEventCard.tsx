@@ -56,7 +56,7 @@ function useSessionState<T>(key: string, fallback: T) {
 }
 
 export default function MainEventCard({ event }: { event: EventState }) {
-  const { phase, clockOffset, randomNumbers, refresh } = event
+  const { phase, clockOffset, winningNumbers, refresh } = event
   const startCountdown = useCountdown(event.startAt, clockOffset)
   const endCountdown = useCountdown(event.endAt, clockOffset)
   const instagramFieldId = useId()
@@ -172,8 +172,8 @@ export default function MainEventCard({ event }: { event: EventState }) {
 
           <div className="event-random">
             <span>당첨 번호</span>
-            {randomNumbers !== null ? (
-              <strong>{randomNumbers.map((n) => `#${n}`).join(' ')}</strong>
+            {winningNumbers !== null ? (
+              <strong>{winningNumbers.map((n) => `#${n}`).join(' ')}</strong>
             ) : (
               <span>곧 발표합니다. 잠시 후 새로고침해 주세요.</span>
             )}
@@ -200,7 +200,7 @@ export default function MainEventCard({ event }: { event: EventState }) {
           <Countdown countdown={phase === 'open' ? endCountdown : startCountdown} />
 
           <div className="entry-form">
-            <h2 className="entry-form__title">{phase === 'open' ? '지금 응모하세요!' : '11월 28일 오후 2시 오픈'}</h2>
+            <h2 className="entry-form__title">{phase === 'open' ? '지금 응모하세요!' : '11월 29일 오후 2시 오픈'}</h2>
 
             {phase === 'waiting' && (
               <div className="event-guide">
@@ -211,7 +211,7 @@ export default function MainEventCard({ event }: { event: EventState }) {
                 </ol>
                 <p className="event-guide__title">당첨 방식</p>
                 <ul>
-                  <li>랜덤 추첨 18명: 5만원 1명, 3만원 2명, 1만원 15명. 같은 아이디는 한 번만 당첨. 종료 직후 발표</li>
+                  <li>당첨 번호 18개: 5만원 1명, 3만원 2명, 1만원 15명. 이벤트 전에 정해 둔 접수 번호이며 종료 직후 발표. 같은 아이디는 한 번만 당첨</li>
                   <li>추천왕: 사전등록 추천 점수 1위 3만원, 2위 1만원</li>
                 </ul>
                 <p className="event-guide__note">네이버 로그인을 한 만 14세 이상이라면 사전등록하지 않았어도 응모할 수 있어요.</p>

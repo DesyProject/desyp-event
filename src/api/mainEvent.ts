@@ -11,8 +11,8 @@ export interface EventStatus {
   startAt: string
   endAt: string
   serverTime: string
-  /** 이벤트 종료 직후 발표하는 랜덤 추첨 당첨 번호(추첨 순서, 최대 18개). 그 전에는 null */
-  randomNumbers: number[] | null
+  /** 이벤트 전에 정해 두고 종료 직후 발표하는 당첨 접수 번호(최대 18개). 그 전에는 null */
+  winningNumbers: number[] | null
 }
 
 /** 서버 기준 내 응모 기록. recent는 최신 번호부터 최대 10개 */
@@ -26,8 +26,8 @@ type EntryBody = { message?: string | null; receiptNumber?: number }
 export type EntryResult = { ok: true; receiptNumber: number } | { ok: false; status: number; message: string }
 
 /** 이벤트 시간은 고정이다. 서버 응답이 오기 전에도 화면을 그리기 위한 기본값 */
-export const EVENT_START_AT = '2026-11-28T14:00:00+09:00'
-export const EVENT_END_AT = '2026-11-28T14:10:00+09:00'
+export const EVENT_START_AT = '2026-11-29T14:00:00+09:00'
+export const EVENT_END_AT = '2026-11-29T14:10:00+09:00'
 
 /** 응모 중 세션이 만료되면 서버 문구 대신 항상 이 안내를 띄운다 */
 export const SESSION_EXPIRED_MESSAGE = '로그인이 만료됐어요. 다시 로그인한 뒤 이어서 응모해 주세요.'
@@ -59,8 +59,8 @@ const MOCK_PHASE_TIME: Record<string, number> = {
 const mockPhaseTime = isMock ? MOCK_PHASE_TIME[new URLSearchParams(window.location.search).get('mockPhase') ?? ''] : undefined
 /** 서버 시계 - 클라이언트 시계. 실제 모드는 첫 응답 전까지 0으로 본다 */
 export const initialClockOffset = mockPhaseTime === undefined ? 0 : mockPhaseTime - Date.now()
-/** 목업 랜덤 추첨 결과. 접수된 번호만 보여준다 */
-const MOCK_RANDOM_NUMBERS = [7, 3, 12, 1, 9, 15, 4, 20, 6, 11, 2, 18, 8, 14, 5, 17, 10, 13]
+/** 목업 당첨 번호. 접수된 번호만 보여준다 */
+const MOCK_WINNING_NUMBERS = [7, 3, 12, 1, 9, 15, 4, 20, 6, 11, 2, 18, 8, 14, 5, 17, 10, 13]
 const MOCK_STORAGE_KEY = 'desyp_mock_entries'
 const MY_RECENT_LIMIT = 10
 const mock = {
@@ -90,9 +90,9 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 function mockStatus(): EventStatus {
   const now = Date.now() + initialClockOffset
   const phase = now < Date.parse(EVENT_START_AT) ? 'BEFORE' : now < Date.parse(EVENT_END_AT) ? 'OPEN' : 'CLOSED'
-  const randomNumbers =
-    phase === 'CLOSED' && mock.lastReceipt > 0 ? MOCK_RANDOM_NUMBERS.filter((n) => n <= mock.lastReceipt) : null
-  return { phase, startAt: EVENT_START_AT, endAt: EVENT_END_AT, serverTime: new Date(now).toISOString(), randomNumbers }
+  const winningNumbers =
+    phase === 'CLOSED' && mock.lastReceipt > 0 ? MOCK_WINNING_NUMBERS.filter((n) => n <= mock.lastReceipt) : null
+  return { phase, startAt: EVENT_START_AT, endAt: EVENT_END_AT, serverTime: new Date(now).toISOString(), winningNumbers }
 }
 
 /** 실제 fetch와 같은 모양(status, body)으로 돌려줘 재시도 로직을 목업에서도 그대로 거친다 */
