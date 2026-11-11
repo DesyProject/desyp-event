@@ -15,6 +15,8 @@ export interface PreRegistrationRequest {
   agreeMarketing: boolean
   /** 나를 추천한 사람이 공유한 추천 코드. 선택 */
   referralCode?: string
+  /** 홍보 링크의 ?utm_source= 값. 선택 */
+  utmSource?: string
 }
 
 export interface ReferralScore {
