@@ -12,6 +12,7 @@ import {
 import { useCountdown } from '../hooks/useCountdown'
 import Countdown from './Countdown'
 import ResultModal from './ResultModal'
+import { readUtmSource } from '../utmSource'
 
 /** 빌드 시 vite.config.ts가 값이 있는지 확인한다 */
 const KAKAO_CHANNEL_URL = import.meta.env.VITE_KAKAO_CHANNEL_URL
@@ -34,23 +35,6 @@ function readSharedReferralCode(): string {
   try {
     if (fromUrl) sessionStorage.setItem(REF_STORAGE_KEY, fromUrl)
     return fromUrl || sessionStorage.getItem(REF_STORAGE_KEY) || ''
-  } catch {
-    return fromUrl // 저장소가 막힌 브라우저
-  }
-}
-
-const UTM_PARAM = 'utm_source'
-const UTM_STORAGE_KEY = 'desyp_utm_source'
-
-/**
- * 홍보 링크(?utm_source=instagram)의 유입 경로를 기억해 사전 등록 요청에 보낸다.
- * 형식 검사는 백엔드가 하며, 맞지 않으면 등록은 그대로 되고 경로만 버린다.
- */
-function readUtmSource(): string {
-  const fromUrl = (new URLSearchParams(window.location.search).get(UTM_PARAM) ?? '').trim().toLowerCase()
-  try {
-    if (fromUrl) sessionStorage.setItem(UTM_STORAGE_KEY, fromUrl)
-    return fromUrl || sessionStorage.getItem(UTM_STORAGE_KEY) || ''
   } catch {
     return fromUrl // 저장소가 막힌 브라우저
   }
