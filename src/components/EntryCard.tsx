@@ -39,6 +39,23 @@ function readSharedReferralCode(): string {
   }
 }
 
+const UTM_PARAM = 'utm_source'
+const UTM_STORAGE_KEY = 'desyp_utm_source'
+
+/**
+ * 홍보 링크(?utm_source=instagram)의 유입 경로를 기억해 사전 등록 요청에 보낸다.
+ * 형식 검사는 백엔드가 하며, 맞지 않으면 등록은 그대로 되고 경로만 버린다.
+ */
+function readUtmSource(): string {
+  const fromUrl = (new URLSearchParams(window.location.search).get(UTM_PARAM) ?? '').trim().toLowerCase()
+  try {
+    if (fromUrl) sessionStorage.setItem(UTM_STORAGE_KEY, fromUrl)
+    return fromUrl || sessionStorage.getItem(UTM_STORAGE_KEY) || ''
+  } catch {
+    return fromUrl // 저장소가 막힌 브라우저
+  }
+}
+
 function shareUrl(code: string): string {
   return `${window.location.origin}/?${REF_PARAM}=${encodeURIComponent(code)}`
 }
@@ -62,6 +79,7 @@ export default function EntryCard() {
   const [agreePrivacy, setAgreePrivacy] = useState(false)
   const [agreeMarketing, setAgreeMarketing] = useState(false)
   const [referrer, setReferrer] = useState(readSharedReferralCode)
+  const [utmSource] = useState(readUtmSource)
   const [referralScore, setReferralScore] = useState<ReferralScore | null>(null)
   const [copied, setCopied] = useState<'code' | 'link' | null>(null)
   const [busy, setBusy] = useState(false)
@@ -133,6 +151,7 @@ export default function EntryCard() {
       agreePrivacy,
       agreeMarketing,
       referralCode: enteredReferralCode || undefined,
+      utmSource: utmSource || undefined,
     })
     setBusy(false)
     if (result.kind === 'success' || result.kind === 'already') {

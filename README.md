@@ -45,7 +45,7 @@ npm run preview          # 빌드 결과 로컬 확인
 | ---- | ---- |
 | `GET /auth/naver/login?return_to=<URL>` | 브라우저가 이 주소로 이동한다. 백엔드가 `state`를 만들어 네이버 인증 페이지로 보내고, 콜백에서 토큰 교환과 프로필 조회(`/v1/nid/me`의 `id`, `email`) 후 세션을 만든다. 끝나면 `return_to`로 돌려보낸다 |
 | `GET /api/me` | 로그인 상태면 `200 { "emailMasked": "des***@naver.com", "registered": false }`, 아니면 `401` |
-| `POST /api/pre-registrations` | 본문 `{ "ageConfirmed": true, "agreePrivacy": true, "agreeMarketing": true, "referralCode": "..." }`. 추천 코드는 선택이며 이메일 같은 개인정보를 추천 식별자로 보내지 않는다. 성공 응답은 본인의 `referralCode`를 반환한다 |
+| `POST /api/pre-registrations` | 본문 `{ "ageConfirmed": true, "agreePrivacy": true, "agreeMarketing": true, "referralCode": "...", "utmSource": "instagram" }`. 추천 코드와 `utmSource`는 선택이며 이메일 같은 개인정보를 추천 식별자로 보내지 않는다. 성공 응답은 본인의 `referralCode`를 반환한다. `utmSource`는 홍보 링크의 `?utm_source=` 값으로, 네이버 로그인을 다녀와도 남도록 sessionStorage에 보관한다 |
 | `GET /api/referrals/me` | 사전등록한 로그인 사용자의 추천 코드, 실제 추천 수, 코드 사용 보너스, 총점을 반환한다 |
 | `POST /api/conversions/kakao-channel-click` | 본문 `{ "source": "PRE_REGISTRATION_COMPLETE" }`. 사전등록 완료자의 카카오톡 채널 버튼 클릭을 기록하고 `204`를 반환한다. 같은 사용자·source는 한 번만 저장된다. 실패해도 프론트는 무시하고 채널을 연다 |
 
