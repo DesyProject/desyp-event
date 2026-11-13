@@ -21,6 +21,11 @@
 }
 html {
   scroll-padding-top: 90px;
+  /* iOS·인스타그램 인앱 브라우저가 글자를 임의로 키워 레이아웃이 깨지는 것을 막는다 */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* body만으로는 iOS에서 가로 넘침이 막히지 않는다. clip은 스크롤 컨테이너를 만들지 않아 sticky 헤더가 유지된다 */
+  overflow-x: clip;
 }
 @media (prefers-reduced-motion: no-preference) {
   html {
@@ -32,7 +37,8 @@ body {
   background: var(--bg-deep);
   color: var(--text-white);
   font-family: var(--font-kr);
-  overflow-x: hidden;
+  /* hidden은 body를 스크롤 컨테이너로 만들어 html의 clip과 함께 쓰면 sticky 헤더가 풀린다 */
+  overflow-x: clip;
 }
 img {
   max-width: 100%;
@@ -1274,6 +1280,10 @@ a {
   }
   .section {
     padding: 60px 16px;
+  }
+  /* 섹션 좌우 여백(16px)만큼만 넓힌다. -5vw면 화면 밖으로 몇 px 넘친다 */
+  .prize-carousel {
+    margin-inline: -16px;
   }
   .hero {
     padding-bottom: 40px;
