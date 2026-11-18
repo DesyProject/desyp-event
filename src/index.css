@@ -291,8 +291,9 @@ a {
 }
 .entry-card__label {
   text-align: center;
-  font-size: 0.75rem;
-  letter-spacing: 0.3em;
+  font-family: var(--font-kr);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
   color: var(--accent-blue-light);
   margin: 0 0 14px;
 }
@@ -323,20 +324,14 @@ a {
 .countdown__unit--days {
   margin-right: 10px;
 }
-.countdown__suffix {
-  font-family: var(--font-kr);
-  font-weight: 800;
-  font-size: 0.5em;
-  margin-left: 2px;
-}
 .countdown__colon {
   font-size: clamp(1.6rem, 4vw, 2.4rem);
   color: var(--accent-blue-light);
   transform: translateY(-8px);
 }
 .countdown__caption {
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
+  font-family: var(--font-kr);
+  font-size: 0.7rem;
   color: var(--text-dim);
   margin-top: 4px;
 }

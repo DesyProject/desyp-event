@@ -164,7 +164,7 @@ export default function MainEventCard({ event }: { event: EventState }) {
         </div>
       ) : (
         <>
-          <p className="entry-card__label">{phase === 'open' ? 'EVENT ENDS IN' : 'EVENT STARTS IN'}</p>
+          <p className="entry-card__label">{phase === 'open' ? '응모 마감까지' : '이벤트 시작까지'}</p>
           <Countdown countdown={phase === 'open' ? endCountdown : startCountdown} />
 
           <div className="entry-form">
