@@ -7,10 +7,8 @@ import Hero from './components/Hero'
 import MainEventCard from './components/MainEventCard'
 import Prize from './components/Prize'
 import { useEventPhase } from './hooks/useEventPhase'
-import { useWheelSectionScroll } from './hooks/useWheelSectionScroll'
 
 export default function App() {
-  useWheelSectionScroll('.hero, .about, .prize, .faq', '.faq')
   const event = useEventPhase()
 
   return (

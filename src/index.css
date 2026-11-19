@@ -36,6 +36,8 @@ body {
   background: var(--bg-deep);
   color: var(--text-white);
   font-family: var(--font-kr);
+  word-break: keep-all; /* 한글을 단어 중간에서 자르지 않는다 */
+  overflow-wrap: anywhere; /* 공백 없는 긴 영문·숫자는 넘치지 않게 끊는다 */
   /* hidden은 body를 스크롤 컨테이너로 만들어 html의 clip과 함께 쓰면 sticky 헤더가 풀린다 */
   overflow-x: clip;
 }
@@ -171,10 +173,14 @@ a {
 .header__hamburger {
   display: none;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 5px;
+  width: 44px;
+  height: 44px;
   background: none;
   border: none;
-  padding: 8px;
+  padding: 0;
 }
 .header__hamburger span {
   width: 22px;
@@ -186,8 +192,9 @@ a {
 /* 배경은 가로 포스터 이미지 한 장(1536x1024). 제목·캐릭터·간판이 이미지에 포함돼 있다. */
 .notice-bar {
   /* 헤더 여백을 상쇄해 화면 가로를 꽉 채운다 */
+  position: relative;
   margin: 20px -5vw -20px;
-  padding: 10px 16px;
+  padding: 10px 44px; /* 양옆 44px: 오른쪽 닫기 버튼 자리, 왼쪽은 가운데 정렬 균형 */
   background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
   color: var(--text-white);
   font-family: var(--font-kr);
@@ -196,12 +203,30 @@ a {
   text-align: center;
   word-break: keep-all;
 }
+.notice-bar p {
+  margin: 0;
+}
+.notice-bar__close {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  transform: translateY(-50%);
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
 .notice-bar strong {
   font-weight: 800;
 }
 .notice-bar a {
   display: inline-block;
-  padding: 4px 2px;
+  padding: 10px 4px;
+  margin: -10px 0;
   color: inherit;
   font-weight: 700;
   text-decoration: underline;
@@ -401,8 +426,12 @@ a {
   color: var(--text-dim);
   margin: 12px 0 0;
 }
+.entry-form__help--lead {
+  margin: 6px 0 18px;
+}
 .entry-form__account {
   display: flex;
+  flex-wrap: wrap; /* 좁으면 이메일을 통째로 다음 줄로 */
   justify-content: space-between;
   align-items: center;
   gap: 12px;
@@ -534,7 +563,8 @@ a {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 0 12px;
+  min-height: 44px;
+  margin: 0 0 4px;
   font-size: 0.9rem;
 }
 .entry-form__checkbox-row a {
@@ -544,8 +574,8 @@ a {
 }
 .entry-form__checkbox-row input {
   flex-shrink: 0; /* 문구가 두 줄이 돼도 체크박스가 줄어들지 않게 */
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   accent-color: var(--accent-blue-light);
 }
 .entry-form__submit {
@@ -596,7 +626,7 @@ a {
   font-weight: 700;
 }
 .event-guide {
-  margin: 0 0 18px;
+  margin: 16px 0 0;
   padding: 14px 16px;
   border: 1px solid var(--card-border);
   border-radius: 10px;
@@ -618,6 +648,28 @@ a {
 .event-guide__note {
   margin: 0;
   color: var(--accent-blue-light);
+}
+summary.event-guide__title {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  margin: -14px 0;
+  cursor: pointer;
+}
+.event-guide[open] summary.event-guide__title {
+  margin-bottom: 4px;
+}
+.event-random__refresh {
+  justify-self: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  background: none;
+  color: var(--accent-blue-light);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
 }
 /* 접수 번호 팝업이 버튼 자리를 그대로 덮는다 */
 .event-submit {
@@ -694,8 +746,8 @@ a {
 }
 /* 체크박스 줄의 "자세히": 사전등록 카드의 링크와 같은 모양 */
 .event-consent__toggle {
-  margin-left: 4px;
-  padding: 0;
+  margin: -12px 0 -12px 0;
+  padding: 12px 4px;
   border: none;
   background: none;
   color: var(--accent-blue-light);
@@ -1027,20 +1079,39 @@ a {
   cursor: pointer;
   transform: translateX(calc(-50% + var(--offset) * var(--card-w) * var(--spread)))
     scale(calc(1 - var(--abs) * 0.16));
-  /* 투명하게 하면 겹친 뒤 카드가 비쳐서, 옆 카드는 어둡게만 한다 */
-  filter: brightness(calc(1 - var(--abs) * 0.28));
+  /* filter·box-shadow를 애니메이션하면 매 프레임 다시 그려 폰에서 버벅인다. 움직임은 transform·opacity만 쓴다 */
   transition:
     transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    filter 0.5s,
-    opacity 0.5s,
-    box-shadow 0.5s;
+    opacity 0.5s;
+}
+/* 옆 카드 어둡게: 투명하게 하면 뒤 카드가 비쳐서 검은 층을 덮는다 */
+.gift-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #000;
+  opacity: calc(var(--abs) * 0.28);
+  transition: opacity 0.5s;
+  pointer-events: none;
+}
+/* 가운데 카드 빛: 그림자는 고정하고 층의 투명도만 바꾼다 */
+.gift-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 36px rgba(47, 155, 255, 0.55);
+  opacity: 0;
+  transition: opacity 0.5s;
+  pointer-events: none;
 }
 .gift-card--active {
   cursor: default;
   border-color: var(--accent-blue-light);
-  box-shadow:
-    0 0 36px rgba(47, 155, 255, 0.55),
-    0 10px 30px rgba(0, 0, 0, 0.5);
+}
+.gift-card--active::before {
+  opacity: 1;
 }
 .gift-card__label {
   font-size: 0.7rem;
@@ -1132,6 +1203,7 @@ a {
   gap: 8px;
 }
 .prize-carousel__dot {
+  position: relative;
   width: 8px;
   height: 8px;
   padding: 0;
@@ -1139,6 +1211,11 @@ a {
   border-radius: 999px;
   background: rgba(154, 165, 201, 0.4);
   transition: width 0.3s, background 0.3s;
+}
+.prize-carousel__dot::before {
+  content: '';
+  position: absolute;
+  inset: -18px -4px; /* 점 사이 간격(8px)과 겹치지 않게 가로는 조금만 넓힌다 */
 }
 .prize-carousel__dot--active {
   width: 24px;
@@ -1151,6 +1228,8 @@ a {
 }
 @media (prefers-reduced-motion: reduce) {
   .gift-card,
+  .gift-card::before,
+  .gift-card::after,
   .prize-carousel__dot {
     transition: none;
   }
@@ -1166,7 +1245,6 @@ a {
 }
 .prize__note {
   color: var(--text-dim);
-  opacity: 0.55;
   font-size: 0.85rem;
 }
 
@@ -1229,23 +1307,6 @@ a {
   margin: 0;
 }
 
-/* 마우스 화면: 휠 한 번에 한 화면씩 넘어가도록 섹션마다 최소 화면 한 칸 높이를 준다 (헤더 80px 제외) */
-@media (pointer: fine) and (min-width: 1025px) {
-  .section {
-    min-height: calc(100svh - 80px);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  .section.about {
-    display: grid;
-    min-height: max(calc(100vw * 802 / 1961), calc(100svh - 80px));
-  }
-  .section.faq {
-    min-height: 0; /* FAQ는 휠 넘김 없이 평소처럼 스크롤한다 */
-  }
-}
-
 /* ===== Responsive ===== */
 @media (max-width: 1024px) {
   .header__nav {
@@ -1278,6 +1339,14 @@ a {
   }
 }
 
+@media (max-width: 600px) {
+  /* 고정 헤더의 배경 흐림은 스크롤마다 다시 그려 폰에서 무겁다. 대신 배경을 더 진하게 */
+  .header {
+    backdrop-filter: none;
+    background: rgba(5, 8, 20, 0.96);
+  }
+}
+
 @media (max-width: 480px) {
   .entry-form__perk {
     float: none;
@@ -1289,7 +1358,8 @@ a {
   }
   .notice-bar {
     margin: 16px -16px -16px;
-    padding: 6px 12px;
+    padding: 6px 40px 6px 12px;
+    text-align: left;
     font-size: 0.8rem;
   }
   .notice-bar__from {
