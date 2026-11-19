@@ -158,7 +158,7 @@ export default function EntryCard() {
       <div className="entry-card__corner entry-card__corner--bl" aria-hidden="true" />
       <div className="entry-card__corner entry-card__corner--br" aria-hidden="true" />
 
-      <p className="entry-card__label">PRE-REGISTRATION ENDS IN</p>
+      <p className="entry-card__label">사전등록 마감까지</p>
 
       <Countdown countdown={countdown} />
 

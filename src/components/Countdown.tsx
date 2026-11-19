@@ -9,24 +9,23 @@ export default function Countdown({ countdown }: { countdown: CountdownValue }) 
         <div className="countdown__unit countdown__unit--days">
           <span className="countdown__value">
             {countdown.days}
-            <span className="countdown__suffix">일</span>
           </span>
-          <span className="countdown__caption">DAYS</span>
+          <span className="countdown__caption">일</span>
         </div>
       )}
       <div className="countdown__unit">
         <span className="countdown__value">{pad2(countdown.hours)}</span>
-        <span className="countdown__caption">HOURS</span>
+        <span className="countdown__caption">시간</span>
       </div>
       <span className="countdown__colon">:</span>
       <div className="countdown__unit">
         <span className="countdown__value">{pad2(countdown.minutes)}</span>
-        <span className="countdown__caption">MINUTES</span>
+        <span className="countdown__caption">분</span>
       </div>
       <span className="countdown__colon">:</span>
       <div className="countdown__unit">
         <span className="countdown__value">{pad2(countdown.seconds)}</span>
-        <span className="countdown__caption">SECONDS</span>
+        <span className="countdown__caption">초</span>
       </div>
     </div>
   )
