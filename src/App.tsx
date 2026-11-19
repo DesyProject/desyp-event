@@ -17,12 +17,6 @@ export default function App() {
     <>
       <Header />
 
-      {/* ponytail: 공지 한 건이라 하드코딩. 이벤트 후 삭제 */}
-      <p className="notice-bar" role="status">
-        <strong>상품 구성 변경</strong> 당첨 번호 상품이 5만원 1명·3만원 2명에서{' '}
-        <strong>5만원 2명·3만원 1명</strong>으로 바뀌었어요. <a href="#prize">자세히</a>
-      </p>
-
       <section id="hero" className="hero">
         <Hero />
         {/* 사전등록 기간에는 기존 사전등록 카드를 그대로 보여 준다 */}
