@@ -9,7 +9,7 @@ export interface EventStatus {
   startAt: string
   endAt: string
   serverTime: string
-  /** 종료 직후 발표하는 당첨 접수 번호(최대 18개). 5만·3만원 3개는 미리 정한 번호, 1만원 15개는 종료 후 추첨. 그 전에는 null */
+  /** 종료 직후 발표하는 당첨 접수 번호(최대 18개). 5만원 2개·3만원 1개·1만원 15개. 1번(선착순)만 미리 공개하고 나머지 방식은 당일 공개. 그 전에는 null */
   winningNumbers: number[] | null
 }
 

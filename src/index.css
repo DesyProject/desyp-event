@@ -185,6 +185,28 @@ a {
 
 /* ===== Hero ===== */
 /* 배경은 가로 포스터 이미지 한 장(1536x1024). 제목·캐릭터·간판이 이미지에 포함돼 있다. */
+.notice-bar {
+  margin: 0;
+  padding: 10px 16px;
+  background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+  color: var(--text-white);
+  font-family: var(--font-kr);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-align: center;
+  word-break: keep-all;
+}
+.notice-bar strong {
+  font-weight: 800;
+}
+.notice-bar a {
+  display: inline-block;
+  padding: 4px 2px;
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
 .hero {
   /* 넓은 화면은 가로 꽉 채움. 좁은 화면은 높이를 확보하고 양옆을 잘라 가운데 제목을 살린다 */
   --poster-h: max(calc(100vw * 2 / 3), 560px);
