@@ -186,8 +186,9 @@ a {
 /* 배경은 가로 포스터 이미지 한 장(1536x1024). 제목·캐릭터·간판이 이미지에 포함돼 있다. */
 .notice-bar {
   /* 헤더 여백을 상쇄해 화면 가로를 꽉 채운다 */
+  position: relative;
   margin: 20px -5vw -20px;
-  padding: 10px 16px;
+  padding: 10px 44px; /* 양옆 44px: 오른쪽 닫기 버튼 자리, 왼쪽은 가운데 정렬 균형 */
   background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
   color: var(--text-white);
   font-family: var(--font-kr);
@@ -195,6 +196,23 @@ a {
   line-height: 1.5;
   text-align: center;
   word-break: keep-all;
+}
+.notice-bar p {
+  margin: 0;
+}
+.notice-bar__close {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  transform: translateY(-50%);
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
 }
 .notice-bar strong {
   font-weight: 800;
@@ -1289,7 +1307,8 @@ a {
   }
   .notice-bar {
     margin: 16px -16px -16px;
-    padding: 6px 12px;
+    padding: 6px 40px 6px 12px;
+    text-align: left;
     font-size: 0.8rem;
   }
   .notice-bar__from {

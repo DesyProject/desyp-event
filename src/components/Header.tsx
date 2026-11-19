@@ -1,5 +1,15 @@
 import { useEffect, useState } from 'react'
 
+const NOTICE_KEY = 'desyp_notice_prize_change_closed'
+
+function readNoticeClosed(): boolean {
+  try {
+    return localStorage.getItem(NOTICE_KEY) === '1'
+  } catch {
+    return false // 저장소가 막힌 브라우저는 매번 보여 준다
+  }
+}
+
 const NAV_LINKS = [
   { href: '#hero', label: 'EVENT' },
   { href: '#about', label: 'ABOUT' },
@@ -37,6 +47,16 @@ function useActiveSection(): string {
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const activeHref = useActiveSection()
+  const [noticeClosed, setNoticeClosed] = useState(readNoticeClosed)
+
+  function closeNotice() {
+    setNoticeClosed(true)
+    try {
+      localStorage.setItem(NOTICE_KEY, '1')
+    } catch {
+      // 저장하지 못해도 이번 방문 동안은 닫힌다
+    }
+  }
 
   return (
     <header className="header">
@@ -78,11 +98,18 @@ export default function Header() {
       </div>
 
       {/* 스크롤해도 보이도록 고정 헤더 안에 둔다. ponytail: 공지 한 건이라 하드코딩, 이벤트 후 삭제 */}
-      <p className="notice-bar" role="status">
-        <strong>상품 구성 변경</strong>{' '}
-        <span className="notice-bar__from">당첨 번호 상품이 5만원 1명·3만원 2명에서 </span>
-        <strong>5만원 2명·3만원 1명</strong>으로 바뀌었어요. <a href="#prize">자세히</a>
-      </p>
+      {!noticeClosed && (
+        <div className="notice-bar" role="status">
+          <p>
+            <strong>상품 구성 변경</strong>{' '}
+            <span className="notice-bar__from">당첨 번호 상품이 5만원 1명·3만원 2명에서 </span>
+            <strong>5만원 2명·3만원 1명</strong>으로 바뀌었어요. <a href="#prize">자세히</a>
+          </p>
+          <button type="button" className="notice-bar__close" aria-label="공지 닫기" onClick={closeNotice}>
+            ×
+          </button>
+        </div>
+      )}
     </header>
   )
 }
