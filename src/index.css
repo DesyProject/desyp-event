@@ -185,7 +185,8 @@ a {
 /* ===== Hero ===== */
 /* 배경은 가로 포스터 이미지 한 장(1536x1024). 제목·캐릭터·간판이 이미지에 포함돼 있다. */
 .notice-bar {
-  margin: 0;
+  /* 헤더 여백을 상쇄해 화면 가로를 꽉 채운다 */
+  margin: 20px -5vw -20px;
   padding: 10px 16px;
   background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
   color: var(--text-white);
@@ -1285,6 +1286,14 @@ a {
   }
   .header {
     padding: 16px;
+  }
+  .notice-bar {
+    margin: 16px -16px -16px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  .notice-bar__from {
+    display: none;
   }
   .header__brand {
     font-size: 1rem;

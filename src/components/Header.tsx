@@ -76,6 +76,13 @@ export default function Header() {
           <span />
         </button>
       </div>
+
+      {/* 스크롤해도 보이도록 고정 헤더 안에 둔다. ponytail: 공지 한 건이라 하드코딩, 이벤트 후 삭제 */}
+      <p className="notice-bar" role="status">
+        <strong>상품 구성 변경</strong>{' '}
+        <span className="notice-bar__from">당첨 번호 상품이 5만원 1명·3만원 2명에서 </span>
+        <strong>5만원 2명·3만원 1명</strong>으로 바뀌었어요. <a href="#prize">자세히</a>
+      </p>
     </header>
   )
 }
