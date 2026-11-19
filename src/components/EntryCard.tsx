@@ -163,7 +163,12 @@ export default function EntryCard() {
       <Countdown countdown={countdown} />
 
       <div className="entry-form">
-        {!closed && !me?.registered && <h2 className="entry-form__title">이벤트 사전등록</h2>}
+        {!closed && !me?.registered && (
+          <>
+            <h2 className="entry-form__title">이벤트 사전등록</h2>
+            <p className="entry-form__help entry-form__help--lead">메인 이벤트는 11월 29일(일) 오후 2시, 단 10분!</p>
+          </>
+        )}
         {closed ? (
           <p className="entry-card__status">사전등록이 마감되었습니다</p>
         ) : me?.registered ? (

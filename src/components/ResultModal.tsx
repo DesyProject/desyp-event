@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 
 interface ResultModalProps {
   open: boolean
@@ -15,6 +16,7 @@ export default function ResultModal({ open, message, onClose }: ResultModalProps
 
   useEffect(() => {
     if (!open) return
+    const opener = document.activeElement as HTMLElement | null
     okButtonRef.current?.focus()
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -29,12 +31,16 @@ export default function ResultModal({ open, message, onClose }: ResultModalProps
       }
     }
     document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      opener?.focus?.()
+    }
   }, [open])
 
   if (!open) return null
 
-  return (
+  // 카드 안에 두면 카드의 쌓임 순서에 갇혀 고정 헤더 아래로 깔린다
+  return createPortal(
     <div className="modal-backdrop">
       <div
         className="modal"
@@ -49,6 +55,7 @@ export default function ResultModal({ open, message, onClose }: ResultModalProps
           OK
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

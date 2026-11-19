@@ -84,9 +84,9 @@ export default function EventInfo() {
           <summary>개인정보 수집·이용 안내</summary>
           <dl>
             <dt>수집 정보</dt>
-            <dd>네이버 계정 식별자, 이메일 / 메인 이벤트 응모 시 Instagram 아이디(당첨 DM 연락용)</dd>
+            <dd>네이버 계정 식별자, 이메일</dd>
             <dt>이용 목적</dt>
-            <dd>중복 참여 확인, 이벤트 시작 안내 및 당첨 연락</dd>
+            <dd>중복 참여 확인, 이벤트 시작 안내 및 추천왕 당첨 연락</dd>
             <dt>보유 기간</dt>
             <dd>이벤트 종료 후 {retentionDays}일 이내 파기</dd>
             <dt>동의 거부</dt>

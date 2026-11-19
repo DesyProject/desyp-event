@@ -11,9 +11,9 @@ function readNoticeClosed(): boolean {
 }
 
 const NAV_LINKS = [
-  { href: '#hero', label: 'EVENT' },
-  { href: '#about', label: 'ABOUT' },
-  { href: '#prize', label: 'PRIZE' },
+  { href: '#hero', label: '이벤트' },
+  { href: '#about', label: '소개' },
+  { href: '#prize', label: '상품' },
   { href: '#faq', label: 'FAQ' },
 ]
 
@@ -81,7 +81,7 @@ export default function Header() {
         </nav>
 
         <a href="#entry-card" className="header__cta">
-          JOIN EVENT →
+          참여하기 →
         </a>
 
         <button

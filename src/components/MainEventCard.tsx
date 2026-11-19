@@ -14,7 +14,7 @@ const RECENT_COUNT = 5
 /** 종료 화면에 보여 줄 최근 접수 번호 개수 */
 const RECENT_LIMIT = 10
 
-// 아이디와 체크 상태는 처음 한 번만 입력하면 연속 응모·새로고침 중에도 이번 세션 동안 유지된다
+// 아이디와 동의는 한 번 입력하면 localStorage에 남겨 새로고침·재방문에도 다시 묻지 않는다
 const INSTAGRAM_KEY = 'desyp_instagram'
 const AGE_KEY = 'desyp_entry_age'
 const CONSENT_KEY = 'desyp_entry_consent'
@@ -44,12 +44,12 @@ function save(key: string, value: unknown, persist = false) {
   }
 }
 
-/** 값이 바뀔 때마다 sessionStorage에도 남기는 state */
-function useSessionState<T>(key: string, fallback: T) {
-  const [value, setValue] = useState<T>(() => load(key, fallback))
+/** 값이 바뀔 때마다 localStorage에도 남기는 state */
+function useStoredState<T>(key: string, fallback: T) {
+  const [value, setValue] = useState<T>(() => load(key, fallback, true))
   const set = (next: T) => {
     setValue(next)
-    save(key, next)
+    save(key, next, true)
   }
   return [value, set] as const
 }
@@ -63,9 +63,9 @@ export default function MainEventCard({ event }: { event: EventState }) {
   const ageId = useId()
   const consentId = useId()
 
-  const [instagramId, setInstagramId] = useSessionState(INSTAGRAM_KEY, '')
-  const [ageConfirmed, setAgeConfirmed] = useSessionState(AGE_KEY, false)
-  const [agreeInstagram, setAgreeInstagram] = useSessionState(CONSENT_KEY, false)
+  const [instagramId, setInstagramId] = useStoredState(INSTAGRAM_KEY, '')
+  const [ageConfirmed, setAgeConfirmed] = useStoredState(AGE_KEY, false)
+  const [agreeInstagram, setAgreeInstagram] = useStoredState(CONSENT_KEY, false)
   const [showConsent, setShowConsent] = useState(false)
   /** 받은 순서대로 쌓인 내 접수 번호 */
   const [receipts, setReceipts] = useState<number[]>(() => load(RECEIPTS_KEY, [], true))
@@ -129,7 +129,7 @@ export default function MainEventCard({ event }: { event: EventState }) {
 
       {closed ? (
         <div className="entry-card__status">
-          <p className="entry-card__label">EVENT CLOSED</p>
+          <p className="entry-card__label">이벤트 종료</p>
           <p className="entry-card__status-title">응모가 마감되었습니다</p>
           <p className="entry-card__status-body">참여해 주셔서 감사합니다!</p>
 
@@ -138,7 +138,12 @@ export default function MainEventCard({ event }: { event: EventState }) {
             {winningNumbers !== null ? (
               <strong>{winningNumbers.map((n) => `#${n}`).join(' ')}</strong>
             ) : (
-              <span>곧 발표합니다. 잠시 후 새로고침해 주세요.</span>
+              <>
+                <span>곧 발표합니다.</span>
+                <button type="button" className="event-random__refresh" onClick={refresh}>
+                  당첨 번호 다시 확인
+                </button>
+              </>
             )}
           </div>
 
@@ -169,21 +174,8 @@ export default function MainEventCard({ event }: { event: EventState }) {
 
           <div className="entry-form">
             <h2 className="entry-form__title">{phase === 'open' ? '지금 응모하세요!' : '11월 29일 오후 2시 오픈'}</h2>
-
             {phase === 'waiting' && (
-              <div className="event-guide">
-                <p className="event-guide__title">참여 방법</p>
-                <ol>
-                  <li>Instagram 아이디와 필수 항목을 미리 입력해 두세요. 로그인은 필요 없어요.</li>
-                  <li>오후 2시부터 10분 동안 "응모하기"를 누를 때마다 새 접수 번호를 받아요. 횟수 제한은 없어요.</li>
-                </ol>
-                <p className="event-guide__title">당첨 방식</p>
-                <ul>
-                  <li>당첨 번호 18개: 5만원 2명·3만원 1명·1만원 15명. 첫 번째 응모자(접수 번호 1번)는 5만원, 나머지 17명의 당첨 방식은 당일 공개. 종료 직후 발표. 같은 아이디는 한 번만 당첨</li>
-                  <li>추천왕: 사전등록 추천 점수 1위 3만원, 2위 1만원</li>
-                </ul>
-                <p className="event-guide__note">만 14세 이상이라면 사전등록하지 않았어도 응모할 수 있어요.</p>
-              </div>
+              <p className="entry-form__help entry-form__help--lead">로그인 없이 만 14세 이상 누구나. 아이디와 동의를 미리 입력해 두세요.</p>
             )}
 
             <form onSubmit={handleSubmit} noValidate>
@@ -202,6 +194,10 @@ export default function MainEventCard({ event }: { event: EventState }) {
                 spellCheck={false}
                 aria-invalid={instagramId !== '' && !idValid}
                 aria-describedby={instagramHelpId}
+                onFocus={(e) => {
+                  const el = e.currentTarget
+                  window.setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300)
+                }}
               />
               <div id={instagramHelpId} className="event-help">
                 {instagramId !== '' && !idValid && (
@@ -277,6 +273,23 @@ export default function MainEventCard({ event }: { event: EventState }) {
                 </div>
               )}
             </form>
+
+            {phase === 'waiting' && (
+              <details className="event-guide">
+                <summary className="event-guide__title">참여 방법·당첨 방식 보기</summary>
+                <p className="event-guide__title">참여 방법</p>
+                <ol>
+                  <li>Instagram 아이디와 필수 항목을 미리 입력해 두세요. 로그인은 필요 없어요.</li>
+                  <li>오후 2시부터 10분 동안 "응모하기"를 누를 때마다 새 접수 번호를 받아요. 횟수 제한은 없어요.</li>
+                </ol>
+                <p className="event-guide__title">당첨 방식</p>
+                <ul>
+                  <li>당첨 번호 18개: 5만원 2명·3만원 1명·1만원 15명. 첫 번째 응모자(접수 번호 1번)는 5만원, 나머지 17명의 당첨 방식은 당일 공개. 종료 직후 발표. 같은 아이디는 한 번만 당첨</li>
+                  <li>추천왕: 사전등록 추천 점수 1위 3만원, 2위 1만원</li>
+                </ul>
+                <p className="event-guide__note">만 14세 이상이라면 사전등록하지 않았어도 응모할 수 있어요.</p>
+              </details>
+            )}
           </div>
         </>
       )}
