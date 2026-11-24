@@ -870,6 +870,110 @@ summary.event-guide__title {
   outline-offset: 2px;
 }
 
+/* ===== Onboarding (첫 방문 안내) ===== */
+/* 모바일은 하단 시트, 넓은 화면은 가운데 카드 */
+.onboarding {
+  margin: auto auto 0;
+  width: min(100%, 440px);
+  max-width: 100%;
+  max-height: 90dvh;
+  padding: 0;
+  border: 1px solid var(--card-border);
+  border-bottom: none;
+  border-radius: 20px 20px 0 0;
+  background: var(--bg-navy);
+  color: var(--text-white);
+  box-shadow: 0 0 40px rgba(30, 123, 255, 0.4);
+}
+.onboarding::backdrop {
+  background: rgba(2, 4, 12, 0.75);
+}
+@media (min-width: 640px) {
+  .onboarding {
+    margin: auto;
+    border-bottom: 1px solid var(--card-border);
+    border-radius: 20px;
+  }
+}
+.onboarding__body {
+  position: relative;
+  padding: 28px 24px calc(20px + env(safe-area-inset-bottom));
+}
+.onboarding__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  font-size: 26px;
+  line-height: 1;
+}
+.onboarding__title {
+  margin: 0 40px 20px 0;
+  font-size: 20px;
+  line-height: 1.35;
+}
+.onboarding__steps {
+  display: grid;
+  gap: 16px;
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+.onboarding__steps li {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+.onboarding__num {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+}
+.onboarding__steps strong {
+  display: block;
+  margin-bottom: 2px;
+}
+.onboarding__steps p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.onboarding__cta {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-white);
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-blue-light));
+}
+.onboarding__skip {
+  display: block;
+  margin: 8px auto 0;
+  padding: 12px;
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  font-size: 14px;
+}
+.onboarding__close:focus-visible,
+.onboarding__cta:focus-visible,
+.onboarding__skip:focus-visible {
+  outline: 2px solid var(--text-white);
+  outline-offset: 2px;
+}
+
 /* ===== Section shared ===== */
 .section {
   position: relative;
