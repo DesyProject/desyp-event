@@ -5,6 +5,7 @@ import Footer from './components/Footer'
 import Header from './components/Header'
 import Hero from './components/Hero'
 import MainEventCard from './components/MainEventCard'
+import Onboarding from './components/Onboarding'
 import Prize from './components/Prize'
 import { useEventPhase } from './hooks/useEventPhase'
 
@@ -32,6 +33,8 @@ export default function App() {
       <Prize />
       <Faq />
       <Footer />
+      {/* 메인 이벤트는 10분뿐이라 그때는 안내를 띄우지 않는다 */}
+      {event.phase === 'registration' && <Onboarding />}
     </>
   )
 }
