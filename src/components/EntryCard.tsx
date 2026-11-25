@@ -23,6 +23,9 @@ const REF_STORAGE_KEY = 'desyp_ref'
 const REFERRAL_CODE_LENGTH = 8
 
 function normalizeReferralCode(value: string): string {
+  // 복사한 초대 문구를 통째로 붙여 넣어도 링크 속 코드를 찾는다
+  const fromLink = value.match(/[?&]ref=([A-Z0-9]{8})(?![A-Z0-9])/i)
+  if (fromLink) return fromLink[1].toUpperCase()
   return value.replace(/\s/g, '').toUpperCase().slice(0, REFERRAL_CODE_LENGTH)
 }
 
@@ -42,6 +45,13 @@ function readSharedReferralCode(): string {
 
 function shareUrl(code: string): string {
   return `${window.location.origin}/?${REF_PARAM}=${encodeURIComponent(code)}`
+}
+
+const SHARE_TEXT = '같이 사전등록하고 선물 받자! 링크로 들어오면 내 추천 코드가 자동으로 입력돼요.'
+
+/** 코드만 보내면 어디에 쓰는지 알 수 없어, 복사할 때 링크까지 함께 넣는다 */
+function inviteMessage(code: string): string {
+  return `[De_sy_P 사전등록]\n${SHARE_TEXT}\n추천 코드: ${code}\n${shareUrl(code)}`
 }
 
 /** "자세히"를 누르면 개인정보 안내를 펼친 뒤 그 위치로 이동한다 */
@@ -93,30 +103,29 @@ export default function EntryCard() {
     !busy &&
     !closed
 
-  async function copyText(text: string, what: 'code' | 'link') {
-    const label = what === 'code' ? '추천 코드' : '링크'
+  async function copyInvite(code: string, what: 'code' | 'link') {
+    const text = inviteMessage(code)
     try {
       await navigator.clipboard.writeText(text)
       setCopied(what)
       window.setTimeout(() => setCopied(null), 2000)
     } catch {
       // 복사가 막힌 브라우저: 직접 복사하도록 안내한다
-      setModalMessage(`복사하지 못했어요. 아래 ${label}를 길게 눌러 직접 복사해주세요.\n${text}`)
+      setModalMessage(`복사하지 못했어요. 아래 내용을 길게 눌러 직접 복사해주세요.\n${text}`)
     }
   }
 
-  /** 폰은 공유 시트(카톡·인스타 등)를 열고, 지원하지 않는 브라우저는 링크를 복사한다 */
+  /** 폰은 공유 시트(카톡·인스타 등)를 열고, 지원하지 않는 브라우저는 초대 문구를 복사한다 */
   async function shareReferral(code: string) {
-    const url = shareUrl(code)
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'De_sy_P 사전등록', text: '같이 사전등록하고 선물 받자! 내 추천 코드가 자동으로 입력돼요.', url })
+        await navigator.share({ title: 'De_sy_P 사전등록', text: `${SHARE_TEXT}\n추천 코드: ${code}`, url: shareUrl(code) })
         return
       } catch (e) {
         if ((e as Error).name === 'AbortError') return // 사용자가 공유 창을 닫음
       }
     }
-    await copyText(url, 'link')
+    await copyInvite(code, 'link')
   }
 
   async function handleLogin() {
@@ -200,10 +209,10 @@ export default function EntryCard() {
                     className="entry-card__share"
                     onClick={() => shareReferral(referralScore.referralCode)}
                   >
-                    {copied === 'link' ? '링크 복사됨!' : '친구에게 공유하기'}
+                    {copied === 'link' ? '복사됨!' : '친구에게 공유하기'}
                   </button>
-                  <button type="button" onClick={() => copyText(referralScore.referralCode, 'code')}>
-                    {copied === 'code' ? '복사됨!' : '코드 복사'}
+                  <button type="button" onClick={() => copyInvite(referralScore.referralCode, 'code')}>
+                    {copied === 'code' ? '복사됨!' : '코드·링크 복사'}
                   </button>
                 </div>
               </div>
