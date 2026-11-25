@@ -744,6 +744,29 @@ summary.event-guide__title {
   color: var(--text-white);
   font-variant-numeric: tabular-nums;
 }
+.event-receipts__more summary {
+  display: inline-block;
+  padding: 15px 8px;
+  color: var(--accent-blue-light);
+  font-weight: 700;
+  text-decoration: underline;
+  list-style: none;
+  cursor: pointer;
+}
+.event-receipts__more summary::-webkit-details-marker {
+  display: none;
+}
+.event-receipts__more[open] .event-receipts__open,
+.event-receipts__more:not([open]) .event-receipts__close {
+  display: none;
+}
+.event-receipts__scroll {
+  max-height: 200px;
+  overflow-y: auto;
+}
+.event-receipts__scroll ul {
+  margin: 0;
+}
 /* 체크박스 줄의 "자세히": 사전등록 카드의 링크와 같은 모양 */
 .event-consent__toggle {
   margin: -12px 0 -12px 0;
