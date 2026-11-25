@@ -107,7 +107,9 @@ export async function fetchEventStatus(): Promise<EventStatus> {
   }
   const res = await fetch(`${API_BASE_URL}/api/event/status`)
   if (!res.ok) throw new Error(`GET /api/event/status ${res.status}`)
-  return res.json()
+  const status = await res.json()
+  // 배열이 아니면(필드 누락 등) 발표 전으로 본다. 그대로 넘기면 화면 전체가 깨진다
+  return { ...status, winningNumbers: Array.isArray(status.winningNumbers) ? status.winningNumbers : null }
 }
 
 /** 응모 한 번. requestId는 호출마다 새로 만들고, 네트워크·429·503 재시도에서만 같은 값을 다시 보낸다 */
