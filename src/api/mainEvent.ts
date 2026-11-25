@@ -1,7 +1,7 @@
 /**
  * 메인 이벤트(응모) API. 계약은 README의 "메인 이벤트 API" 참고.
  * 응모는 로그인 없이 Instagram 아이디만 보낸다. 네이버 로그인은 사전등록에만 쓴다.
- * VITE_API_BASE_URL이 비어 있으면 목업으로 동작한다.
+ * 응모 서버는 사전등록 백엔드와 다른 도메인이다. VITE_EVENT_API_BASE_URL이 비어 있으면 목업으로 동작한다.
  */
 
 export interface EventStatus {
@@ -33,7 +33,7 @@ const DEFAULT_MESSAGE = '응모를 처리하지 못했습니다. 잠시 후 다�
 const MAX_RETRIES = 3
 const RETRY_BASE_MS = 400
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+const API_BASE_URL = import.meta.env.VITE_EVENT_API_BASE_URL
 const isMock = !API_BASE_URL
 
 // ===== 목업 =====

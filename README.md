@@ -21,9 +21,10 @@ npm run preview          # 빌드 결과 로컬 확인
 | `VITE_REGISTRATION_END_AT`   | O    | 사전등록 마감 시각(이벤트 하루 전). ISO 8601, KST 오프셋 포함 (`+09:00`)         |
 | `VITE_RETENTION_DAYS` | O    | 개인정보(네이버 id·이메일, 응모 Instagram 아이디) 보유 기간(일). 이벤트 종료 후 이 기간 안에 파기한다. 비어 있으면 `npm run build`가 실패한다 |
 | `VITE_KAKAO_CHANNEL_URL` | O | 사전등록 완료 화면의 "카카오톡으로 이벤트 알림 받기" 버튼이 새 창으로 여는 카카오톡 채널 주소. 비어 있으면 `npm run dev`·`npm run build`가 실패한다 |
-| `VITE_API_BASE_URL`   | X    | 비워두면 목업 API 사용. 채우면 사전등록과 메인 이벤트 모두 이 주소로 실제 요청 |
+| `VITE_API_BASE_URL`   | X    | 사전등록 백엔드. 비워두면 사전등록 목업 API 사용 |
+| `VITE_EVENT_API_BASE_URL` | X    | 메인 이벤트 응모 서버(`https://event-api.desyp.site`). 비워두면 메인 이벤트 목업 API 사용 |
 
-메인 이벤트용 새 환경 변수는 없다. 이벤트 시각(2026-11-29 14:00~14:10 KST)은 `src/api/mainEvent.ts`에 고정값으로 두고, 서버 응답의 `startAt`·`endAt`이 오면 그 값을 쓴다. 보관 기간 안내는 `VITE_RETENTION_DAYS`를 같이 쓴다.
+메인 이벤트 응모 서버 주소만 `VITE_EVENT_API_BASE_URL`로 따로 둔다. 이벤트 시각(2026-11-29 14:00~14:10 KST)은 `src/api/mainEvent.ts`에 고정값으로 두고, 서버 응답의 `startAt`·`endAt`이 오면 그 값을 쓴다. 보관 기간 안내는 `VITE_RETENTION_DAYS`를 같이 쓴다.
 
 ## 사전등록 흐름
 
@@ -100,7 +101,7 @@ npm run preview          # 빌드 결과 로컬 확인
 
 ### 메인 이벤트 API
 
-모든 요청은 로그인 없이, 쿠키 없이(`credentials` 미지정) 보낸다. 사전등록 여부와는 무관하다.
+모든 요청은 `VITE_EVENT_API_BASE_URL`(`https://event-api.desyp.site`, EKS 응모 서버)로 로그인 없이, 쿠키 없이(`credentials` 미지정) 보낸다. 사전등록 여부와는 무관하다.
 
 | 요청 | 응답 |
 | ---- | ---- |
@@ -120,7 +121,7 @@ npm run preview          # 빌드 결과 로컬 확인
 
 ### 목업으로 확인하기
 
-`VITE_API_BASE_URL`이 비어 있을 때만 동작한다. 사전등록 로그인은 버튼을 누르면 바로 로그인되고, 새로고침하면 풀린다. 응모 목업의 접수 번호 카운터는 `sessionStorage`에 둬서 새로고침해도 이어지고 탭을 닫으면 초기화된다. 내 접수 번호는 실제 모드와 같이 `localStorage`에 남는다. 응답은 200~600ms 늦게 온다.
+사전등록은 `VITE_API_BASE_URL`, 메인 이벤트는 `VITE_EVENT_API_BASE_URL`이 비어 있을 때 각각 동작한다. 사전등록 로그인은 버튼을 누르면 바로 로그인되고, 새로고침하면 풀린다. 응모 목업의 접수 번호 카운터는 `sessionStorage`에 둬서 새로고침해도 이어지고 탭을 닫으면 초기화된다. 내 접수 번호는 실제 모드와 같이 `localStorage`에 남는다. 응답은 200~600ms 늦게 온다.
 
 - `?mockPhase=registration|waiting|open|closed`: 서버 시계를 그 단계로 옮긴다. `registration`·`waiting`은 다음 단계 30초 전, `open`·`closed`는 시작·종료 1초 뒤다. 실제 모드에서는 무시한다
 - Instagram 아이디 `error` → `503`(재시도 3번 뒤 오류 모달), `slow` → 3초 지연, `badrequest` → `400`, `closed` → `410`
@@ -140,4 +141,4 @@ npx vercel        # 최초 배포 (로그인 필요)
 npx vercel --prod # 프로덕션 배포
 ```
 
-Vercel 프로젝트 설정의 Environment Variables에 `VITE_REGISTRATION_END_AT`, `VITE_RETENTION_DAYS`, `VITE_KAKAO_CHANNEL_URL`(필수), `VITE_API_BASE_URL`(선택)을 등록해야 빌드가 성공한다.
+Vercel 프로젝트 설정의 Environment Variables에 `VITE_REGISTRATION_END_AT`, `VITE_RETENTION_DAYS`, `VITE_KAKAO_CHANNEL_URL`(필수), `VITE_API_BASE_URL`·`VITE_EVENT_API_BASE_URL`(선택)을 등록해야 빌드가 성공한다.
