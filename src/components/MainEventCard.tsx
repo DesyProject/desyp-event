@@ -9,10 +9,8 @@ import ResultModal from './ResultModal'
 const POPUP_MS = 1000
 /** 14:00 정각에 모두가 동시에 누르지 않도록 버튼을 0~1초 무작위로 늦게 연다 */
 const ARM_JITTER_MS = 1000
-/** 응모 중 카드에 보여 줄 최근 접수 번호 개수 */
+/** 펼치지 않았을 때 보여 줄 최근 접수 번호 개수 */
 const RECENT_COUNT = 5
-/** 종료 화면에 보여 줄 최근 접수 번호 개수 */
-const RECENT_LIMIT = 10
 
 // 아이디와 동의는 한 번 입력하면 localStorage에 남겨 새로고침·재방문에도 다시 묻지 않는다
 const INSTAGRAM_KEY = 'desyp_instagram'
@@ -52,6 +50,36 @@ function useStoredState<T>(key: string, fallback: T) {
     save(key, next, true)
   }
   return [value, set] as const
+}
+
+/** 최근 번호만 먼저 보여 주고, 나머지는 펼쳐서 모두 확인한다 */
+function ReceiptList({ receipts }: { receipts: number[] }) {
+  const latestFirst = [...receipts].reverse()
+  const rest = latestFirst.slice(RECENT_COUNT)
+  const items = (numbers: number[]) => (
+    <ul>
+      {numbers.map((n) => (
+        <li key={n}>#{n}</li>
+      ))}
+    </ul>
+  )
+
+  return (
+    <>
+      {items(latestFirst.slice(0, RECENT_COUNT))}
+      {rest.length > 0 && (
+        <details className="event-receipts__more">
+          <summary>
+            <span className="event-receipts__open">번호 {rest.length}개 더 보기</span>
+            <span className="event-receipts__close">접기</span>
+          </summary>
+          <div className="event-receipts__scroll" tabIndex={0} role="region" aria-label="나머지 접수 번호">
+            {items(rest)}
+          </div>
+        </details>
+      )}
+    </>
+  )
 }
 
 export default function MainEventCard({ event }: { event: EventState }) {
@@ -117,7 +145,6 @@ export default function MainEventCard({ event }: { event: EventState }) {
     }, POPUP_MS)
   }
 
-  const recent = receipts.slice(-RECENT_LIMIT).reverse()
   const myWins = winningNumbers === null ? [] : receipts.filter((n) => winningNumbers.includes(n))
 
   return (
@@ -152,13 +179,9 @@ export default function MainEventCard({ event }: { event: EventState }) {
               <span>
                 {myWins.length > 0
                   ? `당첨된 내 접수 번호 ${myWins.map((n) => `#${n}`).join(' ')}`
-                  : `내 응모 ${receipts.length}회 · 최근 접수 번호`}
+                  : `내 응모 ${receipts.length}회 · 접수 번호`}
               </span>
-              <ul>
-                {recent.map((n) => (
-                  <li key={n}>#{n}</li>
-                ))}
-              </ul>
+              <ReceiptList receipts={receipts} />
             </div>
           )}
 
@@ -265,11 +288,7 @@ export default function MainEventCard({ event }: { event: EventState }) {
               {phase === 'open' && receipts.length > 0 && (
                 <div className="event-receipts">
                   <span>내 응모 {receipts.length}회</span>
-                  <ul>
-                    {recent.slice(0, RECENT_COUNT).map((n) => (
-                      <li key={n}>#{n}</li>
-                    ))}
-                  </ul>
+                  <ReceiptList receipts={receipts} />
                 </div>
               )}
             </form>
