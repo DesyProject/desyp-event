@@ -1572,14 +1572,29 @@ summary.event-guide__title {
   outline: 2px solid var(--text-white);
   outline-offset: 2px;
 }
+/* 예시 사진이 팝업 배경(남색)과 섞이지 않게 밝은 액자에 넣는다 */
+.tutorial__shot {
+  position: relative;
+  margin: 16px 0 0;
+  padding: 26px 10px 10px;
+  border-radius: 16px;
+  background: #e8eefb;
+}
+.tutorial__badge {
+  position: absolute;
+  top: 6px;
+  left: 12px;
+  color: #1e4fbf;
+  font-size: 12px;
+  font-weight: 800;
+}
 .tutorial__img {
   display: block;
   width: 100%;
-  max-height: 48dvh;
+  max-height: 44dvh;
   object-fit: contain;
-  margin-top: 12px;
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
+  border-radius: 10px;
+  background: #0a0f24;
 }
 .tutorial__tips {
   margin: 0 0 24px;
