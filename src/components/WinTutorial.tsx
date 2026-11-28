@@ -84,11 +84,14 @@ export default function WinTutorial() {
                 {step + 1}. {current.title}
               </h2>
               <p className="tutorial__body">{current.body}</p>
-              <img
-                className="tutorial__img"
-                src={`/assets/tutorial/${current.img}.png`}
-                alt={`${current.title} 예시 화면`}
-              />
+              <figure className="tutorial__shot">
+                <figcaption className="tutorial__badge">예시 화면</figcaption>
+                <img
+                  className="tutorial__img"
+                  src={`/assets/tutorial/${current.img}.png`}
+                  alt={`${current.title} 예시 화면`}
+                />
+              </figure>
               <p className="tutorial__note">사진 속 번호는 예시예요.</p>
             </>
           ) : (
