@@ -4,6 +4,7 @@ import { useCountdown } from '../hooks/useCountdown'
 import type { EventState } from '../hooks/useEventPhase'
 import Countdown from './Countdown'
 import ResultModal from './ResultModal'
+import WinTutorial from './WinTutorial'
 
 /** 접수 번호 팝업이 버튼을 가리는 시간 = 연속 응모 간격 */
 const POPUP_MS = 1000
@@ -293,6 +294,7 @@ export default function MainEventCard({ event }: { event: EventState }) {
               )}
             </form>
 
+            {phase === 'waiting' && <WinTutorial />}
             {phase === 'waiting' && (
               <details className="event-guide">
                 <summary className="event-guide__title">참여 방법·당첨 방식 보기</summary>
