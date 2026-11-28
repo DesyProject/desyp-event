@@ -1527,3 +1527,42 @@ summary.event-guide__title {
     box-shadow: none;
   }
 }
+
+/* ===== WinTutorial (대기 화면 당첨 안내) ===== */
+.tutorial {
+  overflow-y: auto;
+}
+.tutorial-open {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid var(--accent-blue-light);
+  border-radius: 999px;
+  background: rgba(30, 123, 255, 0.12);
+  color: var(--text-white);
+  font-size: 15px;
+  font-weight: 700;
+}
+.tutorial__img {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+}
+.tutorial__tips {
+  margin: 0 0 8px;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.tutorial__note {
+  margin: 0 0 16px;
+  color: var(--text-dim);
+  font-size: 12px;
+}
+.tutorial-open:focus-visible {
+  outline: 2px solid var(--text-white);
+  outline-offset: 2px;
+}
